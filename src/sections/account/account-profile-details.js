@@ -17,6 +17,11 @@ const states = [
     label: 'Alabama'
   },
   {
+    value: 'paris',
+    label: 'Paris'
+  
+  },
+  {
     value: 'new-york',
     label: 'New York'
   },
@@ -32,12 +37,12 @@ const states = [
 
 export const AccountProfileDetails = () => {
   const [values, setValues] = useState({
-    firstName: 'Anika',
-    lastName: 'Visser',
-    email: 'demo@devias.io',
+    firstName: 'Bob',
+    lastName: 'diallo',
+    email: 'bobo@uspn.fr',
     phone: '',
-    state: 'los-angeles',
-    country: 'USA'
+    state: 'paris',
+    country: 'france'
   });
 
   const handleChange = useCallback(
