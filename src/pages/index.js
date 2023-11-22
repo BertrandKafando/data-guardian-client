@@ -158,7 +158,7 @@ const Page = () => (
                   ref: 'DEV1049',
                   amount: 30.5,
                   customer: {
-                    name: 'Ekaterina Tankova'
+                    name: 'Amadou NGAM'
                   },
                   createdAt: 1555016400000,
                   status: 'pending'
