@@ -25,8 +25,8 @@ export const items = [
     )   
   },
   {
-    title: 'Résultats',
-    path: '/',
+    title: 'Meta data',
+    path: '/metadata',
     icon: (
       <SvgIcon fontSize="small">
         <ChartBarIcon />

@@ -1,5 +1,3 @@
-import { format } from 'date-fns';
-import PropTypes from 'prop-types';
 import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
 import {
   Box,
@@ -19,10 +17,8 @@ import {
   TableContainer
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
-import { SeverityPill } from 'src/components/severity-pill';
 import { useState } from 'react';
-import CancelIcon from '@mui/icons-material/Cancel';
-import { fullPageModalStyle, modalHeaderStyle, closeButtonStyle } from "./style-popup";
+import { fullPageModalStyle, modalHeaderStyle } from "./style-popup";
 
 
 export const MetaSpecialCar = (props) => {

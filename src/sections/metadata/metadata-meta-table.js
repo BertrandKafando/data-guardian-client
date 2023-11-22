@@ -18,8 +18,7 @@ import {
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
 import { useState } from 'react';
-import CancelIcon from '@mui/icons-material/Cancel';
-import { fullPageModalStyle, modalHeaderStyle, closeButtonStyle } from "./style-popup";
+import { fullPageModalStyle, modalHeaderStyle } from "./style-popup";
 
 
 
