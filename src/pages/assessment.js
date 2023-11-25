@@ -128,7 +128,7 @@ const Page = () => {
     if (selectedOption.length == 1){
       encodeFileToBase64(fileToSend, (base64Data)=> {
             
-        sendFileAndLaunchDiagnostic(base64Data, "CSV", selectedOption[0]);
+        sendFileAndLaunchDiagnostic(base64Data, fileToSend, "CSV", selectedOption[0]);
         })
     }else{
       console.log("Aucun option n'a été choisi");
