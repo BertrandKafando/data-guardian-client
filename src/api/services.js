@@ -22,7 +22,7 @@ export const sendFileAndLaunchDiagnostic = async (base64File, file, fileExtensio
     const formData = new FormData();
     // formData.append("base64File", base64File);
     // formData.append("fileExtension", fileExtension);
-    // formData.append("option", option);
+    formData.append("parametre_diagnostic", option);
 
 
     formData.append("nom_base_de_donnees", "bdd")

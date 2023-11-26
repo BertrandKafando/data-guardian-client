@@ -71,6 +71,8 @@ import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
         setLoading(true);
     
         const selectedOption = Object.keys(checkboxValues).filter((key) => checkboxValues[key]);
+
+        console.log(selectedOption[0]);
     
         if (selectedOption.length == 1){
           encodeFileToBase64(fileToSend, (base64Data)=> {
