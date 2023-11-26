@@ -20,9 +20,9 @@ export const sendCSV = async (file) => {
 export const sendFileAndLaunchDiagnostic = async (base64File, file, fileExtension, option) => {
   try {
     const formData = new FormData();
-    formData.append("base64File", base64File);
-    formData.append("fileExtension", fileExtension);
-    formData.append("option", option);
+    // formData.append("base64File", base64File);
+    // formData.append("fileExtension", fileExtension);
+    // formData.append("option", option);
 
 
     formData.append("nom_base_de_donnees", "bdd")
@@ -31,7 +31,10 @@ export const sendFileAndLaunchDiagnostic = async (base64File, file, fileExtensio
     formData.append("separateur", "Virgule")
     formData.append("format_fichier", "Tabulaire")
     formData.append("nom_base_de_donnees", "bdd_test")
+    
+    formData.append("taille_fichier", "1250")
     formData.append("fichier_bd", file)
+    
     formData.append("avec_entete", true)
 
     const response = await productApi.post("/base-de-donnees/", formData, {
@@ -39,7 +42,7 @@ export const sendFileAndLaunchDiagnostic = async (base64File, file, fileExtensio
         "Content-Type": "multipart/form-data",
       },
     });
-
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error sending file and launching diagnostic:", error);
