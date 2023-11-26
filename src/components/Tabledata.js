@@ -25,7 +25,7 @@ const DataTable = () => {
           <tr>
             <th>Colonne 1</th>
             <th>Colonne 2</th>
-            {/* Ajoutez d'autres en-têtes de colonnes selon votre structure de données */}
+            {/* Ajoutez d'autres en-têtes de colonnes  */}
           </tr>
         </thead>
         <tbody>
@@ -33,7 +33,7 @@ const DataTable = () => {
             <tr key={index}>
               <td>{row.column1}</td>
               <td>{row.column2}</td>
-              {/* Ajoutez d'autres cellules selon votre structure de données */}
+              {/* Ajoutez d'autres cellules  */}
             </tr>
           ))}
         </tbody>
