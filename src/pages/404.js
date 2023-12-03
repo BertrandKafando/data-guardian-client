@@ -48,7 +48,7 @@ const Page = () => (
             sx={{ mb: 3 }}
             variant="h3"
           >
-            404: The page you are looking for isn’t here
+            404: Page not found
           </Typography>
           <Typography
             align="center"
@@ -69,7 +69,7 @@ const Page = () => (
             sx={{ mt: 3 }}
             variant="contained"
           >
-            Go back to dashboard
+            Go back to dashboard 
           </Button>
         </Box>
       </Container>

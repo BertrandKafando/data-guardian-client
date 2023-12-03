@@ -25,24 +25,24 @@ const Page = () => {
   const [method, setMethod] = useState('email');
   const formik = useFormik({
     initialValues: {
-      email: 'demo@devias.io',
-      password: 'Password123!',
+      identifiant: 'amadou',
+      password: '123456',
       submit: null
     },
     validationSchema: Yup.object({
-      email: Yup
+      identifiant: Yup
         .string()
-        .email('Must be a valid email')
-        .max(255)
-        .required('Email is required'),
+        .max(100)
+        .required("l'identifiant est requis"),
       password: Yup
         .string()
-        .max(255)
-        .required('Password is required')
+        .max(100)
+        .required('Mot de passe requis')
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signIn(values.email, values.password);
+        await auth.signIn(values.identifiant, values.password);
+        helpers.setStatus({ success: true });
         router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });
@@ -71,7 +71,7 @@ const Page = () => {
     <>
       <Head>
         <title>
-          Login | Data Guardian Pro
+          Se connecter | Data Guardian Pro
         </title>
       </Head>
       <Box
@@ -97,13 +97,13 @@ const Page = () => {
               sx={{ mb: 3 }}
             >
               <Typography variant="h4">
-                Login
+              Se connecter
               </Typography>
               <Typography
                 color="text.secondary"
                 variant="body2"
               >
-                Don&apos;t have an account?
+               Vous n'avez pas de compte ?
                 &nbsp;
                 <Link
                   component={NextLink}
@@ -111,7 +111,7 @@ const Page = () => {
                   underline="hover"
                   variant="subtitle2"
                 >
-                  Register
+                  S'incrire
                 </Link>
               </Typography>
             </Stack>
@@ -121,23 +121,26 @@ const Page = () => {
                 noValidate
                 onSubmit={formik.handleSubmit}
               >
+                 {formik.errors.submit && (
+
+                    <Alert severity="error" variant="filled" sx={{ maxWidth: '100%', marginBottom: '10px' }}>{formik.errors.submit}</Alert>
+                  )}
                 <Stack spacing={3}>
                   <TextField
-                    error={!!(formik.touched.email && formik.errors.email)}
+                    error={!!(formik.touched.identifiant && formik.errors.identifiant)}
                     fullWidth
-                    helperText={formik.touched.email && formik.errors.email}
-                    label="Email Address"
-                    name="email"
+                    helperText={formik.touched.identifiant && formik.errors.identifiant}
+                    label="Votre identifiant"
+                    name="identifiant"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="email"
-                    value={formik.values.email}
+                    value={formik.values.identifiant}
                   />
                   <TextField
                     error={!!(formik.touched.password && formik.errors.password)}
                     fullWidth
                     helperText={formik.touched.password && formik.errors.password}
-                    label="Password"
+                    label="Mot de passe"
                     name="password"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
@@ -145,18 +148,8 @@ const Page = () => {
                     value={formik.values.password}
                   />
                 </Stack>
-                <FormHelperText sx={{ mt: 1 }}>
-                  Optionally you can skip.
-                </FormHelperText>
-                {formik.errors.submit && (
-                  <Typography
-                    color="error"
-                    sx={{ mt: 3 }}
-                    variant="body2"
-                  >
-                    {formik.errors.submit}
-                  </Typography>
-                )}
+              
+               
                 <Button
                   fullWidth
                   size="large"
@@ -164,7 +157,7 @@ const Page = () => {
                   type="submit"
                   variant="contained"
                 >
-                  Continue
+                 Se connecter
                 </Button>
                 <Button
                   fullWidth
@@ -180,7 +173,7 @@ const Page = () => {
                   sx={{ mt: 3 }}
                 >
                   <div>
-                    You can use <b>demo@devias.io</b> and password <b>Password123!</b>
+                    You can use <b>amadou</b> and password <b>123456</b>
                   </div>
                 </Alert>
               </form>

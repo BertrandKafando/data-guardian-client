@@ -1,16 +1,14 @@
 import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon';
 import CogIcon from '@heroicons/react/24/solid/CogIcon';
 import LockClosedIcon from '@heroicons/react/24/solid/LockClosedIcon';
-import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon';
 import UserIcon from '@heroicons/react/24/solid/UserIcon';
 import UserPlusIcon from '@heroicons/react/24/solid/UserPlusIcon';
-import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
-import XCircleIcon from '@heroicons/react/24/solid/XCircleIcon';
+import { Settings } from '@mui/icons-material';
 import { SvgIcon } from '@mui/material';
 
 export const items = [
   {
-    title: 'Home',
+    title: 'Accueil',
     path: '/home',
     icon: (
       <SvgIcon fontSize="small">
@@ -19,8 +17,8 @@ export const items = [
     )
   },
   {
-    title: 'Overview',
-    path: '/',
+    title: 'Projets',
+    path: '/project',
     icon: (
       <SvgIcon fontSize="small">
         <ChartBarIcon />
@@ -28,7 +26,25 @@ export const items = [
     )
   },
   {
-    title: 'Account',
+    title: 'Traitements',
+    path: '/assessment',
+    icon: (
+      <SvgIcon fontSize="small">
+        <ChartBarIcon />
+      </SvgIcon>
+    )   
+  },
+  {
+    title: 'Résultats',
+    path: '/metadata',
+    icon: (
+      <SvgIcon fontSize="small">
+        <ChartBarIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Compte',
     path: '/account',
     icon: (
       <SvgIcon fontSize="small">
@@ -38,7 +54,7 @@ export const items = [
 
   },
   {
-    title: 'Login',
+    title: 'Se connecter',
     path: '/auth/login',
     icon: (
       <SvgIcon fontSize="small">
@@ -47,11 +63,20 @@ export const items = [
     )
   },
   {
-    title: 'Register',
+    title: 'S\'inscrire',
     path: '/auth/register',
     icon: (
       <SvgIcon fontSize="small">
         <UserPlusIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Paramètres',
+    path: '/settings',
+    icon: (
+      <SvgIcon fontSize="small">
+        <Settings />
       </SvgIcon>
     )
   }
