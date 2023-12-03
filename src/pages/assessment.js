@@ -121,7 +121,7 @@ const Page = () => {
             </Stack>
 
             {errorFileIsEmpty && (
-              <Alert severity="error" onClose={() => {setErrorFileIsEmpty(false)}} variant="filled" sx={{ maxWidth: '400px' }}>Veuillez d'abord charger un fichier</Alert>
+              <Alert severity="error" onClose={() => { setErrorFileIsEmpty(false) }} variant="filled" sx={{ maxWidth: '400px' }}>Veuillez d'abord charger un fichier</Alert>
             )}
             
             <Upload handleFileUpload={handleFileUpload} />
