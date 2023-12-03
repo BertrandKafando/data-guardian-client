@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
 import PropTypes from 'prop-types';
 
+import { signInRequest, signUpRequest } from "src/api/auth.service";
+
+
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
   SIGN_IN: 'SIGN_IN',
@@ -75,7 +78,7 @@ export const AuthProvider = (props) => {
     let isAuthenticated = false;
 
     try {
-      isAuthenticated = window.sessionStorage.getItem('authenticated') === 'true';
+      isAuthenticated = window.localStorage.getItem('authenticated') === 'true';
     } catch (err) {
       console.error(err);
     }
@@ -84,7 +87,7 @@ export const AuthProvider = (props) => {
       const user = {
         id: '5e86809283e28b96d2d38537',
         avatar: '/assets/avatars/avatar-anika-visser.png',
-        name: 'Anika Visser',
+        name: 'my name',
         email: 'anika.visser@devias.io'
       };
 
@@ -109,7 +112,7 @@ export const AuthProvider = (props) => {
 
   const skip = () => {
     try {
-      window.sessionStorage.setItem('authenticated', 'true');
+      window.localStorage.setItem('authenticated', 'true');
     } catch (err) {
       console.error(err);
     }
@@ -117,7 +120,6 @@ export const AuthProvider = (props) => {
     const user = {
       id: '5e86809283e28b96d2d38537',
       avatar: '/assets/avatars/avatar-anika-visser.png',
-      name: 'Anika Visser',
       email: 'anika.visser@devias.io'
     };
 
@@ -128,22 +130,30 @@ export const AuthProvider = (props) => {
   };
 
   const signIn = async (email, password) => {
-    if (email !== 'demo@devias.io' || password !== 'Password123!') {
-      throw new Error('Please check your email and password');
-    }
+
+    let user = null;
+  
 
     try {
-      window.sessionStorage.setItem('authenticated', 'true');
-    } catch (err) {
-      console.error(err);
+      await signInRequest(email, password).then((response)=>{
+        window.localStorage.setItem('token', response?.token);
+        window.localStorage.setItem('authenticated', 'true');
+        
+        user = {
+          id: response?.user.id,
+          avatar: '/assets/avatars/avatar-anika-visser.png',
+          email: response?.user.identifiant,
+          name: response?.user.prenom + " " + response?.user.nom
+        }
+
+
+
+      })
+    } catch (error) {
+      throw new Error(error);
     }
 
-    const user = {
-      id: '5e86809283e28b96d2d38537',
-      avatar: '/assets/avatars/avatar-anika-visser.png',
-      name: 'Anika Visser',
-      email: 'anika.visser@devias.io'
-    };
+    
 
     dispatch({
       type: HANDLERS.SIGN_IN,
@@ -151,8 +161,21 @@ export const AuthProvider = (props) => {
     });
   };
 
-  const signUp = async (email, name, password) => {
-    throw new Error('Sign up is not implemented');
+  const signUp = async (user_info) => {
+
+    let user = null;
+
+    await signUpRequest(user_info).then((response)=> {
+      user = response.data;
+    }).catch((error)=>{
+      console.log(error);
+      throw new Error(error);
+    })
+
+    dispatch({
+      type: HANDLERS.INITIALIZE,
+      payload: user
+    });
   };
 
   const signOut = () => {
