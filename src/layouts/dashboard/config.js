@@ -8,7 +8,7 @@ import { SvgIcon } from '@mui/material';
 
 export const items = [
   {
-    title: 'Home',
+    title: 'Accueil',
     path: '/home',
     icon: (
       <SvgIcon fontSize="small">
@@ -17,7 +17,16 @@ export const items = [
     )
   },
   {
-    title: 'Data Assessment',
+    title: 'Projets',
+    path: '/project',
+    icon: (
+      <SvgIcon fontSize="small">
+        <ChartBarIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Traitements',
     path: '/assessment',
     icon: (
       <SvgIcon fontSize="small">
@@ -26,7 +35,7 @@ export const items = [
     )   
   },
   {
-    title: 'Meta data',
+    title: 'Résultats',
     path: '/metadata',
     icon: (
       <SvgIcon fontSize="small">
@@ -35,7 +44,7 @@ export const items = [
     )
   },
   {
-    title: 'Account',
+    title: 'Compte',
     path: '/account',
     icon: (
       <SvgIcon fontSize="small">
@@ -45,7 +54,7 @@ export const items = [
 
   },
   {
-    title: 'Login',
+    title: 'Se connecter',
     path: '/auth/login',
     icon: (
       <SvgIcon fontSize="small">
@@ -54,7 +63,7 @@ export const items = [
     )
   },
   {
-    title: 'Register',
+    title: 'S\'inscrire',
     path: '/auth/register',
     icon: (
       <SvgIcon fontSize="small">
