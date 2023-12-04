@@ -19,31 +19,33 @@ export const sendCSV = async (file) => {
 
 export const sendFileAndLaunchDiagnostic = async (base64File, file, fileExtension, option) => {
   try {
-    const formData = new FormData();
-    // formData.append("base64File", base64File);
-    // formData.append("fileExtension", fileExtension);
-    formData.append("parametre_diagnostic", option);
 
+    const requestData = {
+      parametre_diagnostic: option,
+      base_de_donnees: {
+        nom_base_de_donnees: "bdd1",
+        type_fichier: fileExtension,
+        nom_fichier: "string",
+        format_fichier: "Tabulaire",
+        separateur: "Virgule",
+        avec_entete: true,
+        fichier_bd: file
+      }
+    }
 
-    formData.append("nom_base_de_donnees", "bdd")
-    formData.append("type_fichier", fileExtension)
-    formData.append("nom_fichier", "nom_fichier.csv")
-    formData.append("separateur", "Virgule")
-    formData.append("format_fichier", "Tabulaire")
-    formData.append("nom_base_de_donnees", "bdd_test")
-    
-    formData.append("taille_fichier", "1250")
-    formData.append("fichier_bd", file)
-    
-    formData.append("avec_entete", true)
-
-    const response = await productApi.post("/base-de-donnees/", formData, {
+    const config = {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
+        'Authorization': 'Token 82d6f18436b8389ba0347aba8dd928ab83f5b2f1'
       },
-    });
-    console.log(response.data);
+    };
+
+    const response = await productApi.post('/diagnostic/', requestData, config);
+
     return response.data;
+
+  
+  
   } catch (error) {
     console.error("Error sending file and launching diagnostic:", error);
     throw error;
