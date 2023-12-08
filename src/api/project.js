@@ -25,8 +25,31 @@ export const createProject = async (nom_projet, descriptif) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error creating project:", error);
+    console.error("Erreur de  creation du project:", error);
     throw error;
   }
 }
 
+
+
+
+export const deleteProject = async (projectId) => {
+  try {
+    const response = await productApi.delete(`/projet/${projectId}/`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur de suppression du project avec ID ${projectId}:", error);
+    throw error;
+  }
+};
+
+
+export const editProject = async (projectId, updatedProjectData) => {
+  try {
+    const response = await productApi.put(`/projet/${projectId}/`, updatedProjectData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error editing project with ID ${projectId}:`, error);
+    throw error;
+  }
+};
