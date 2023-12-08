@@ -118,11 +118,11 @@ export const AuthProvider = (props) => {
         window.localStorage.setItem('authenticated', 'true');
         
 
-        
+
         user = {
           id: response?.user.id,
           identifiant: response?.user.identifiant,
-          avatar: '/assets/avatars/avatar-anika-visser.png',
+          avatar: '/assets/avatars/avatar.png',
           name: response?.user.prenom + " " + response?.user.nom,
           organisation: response?.user.organisation,
           

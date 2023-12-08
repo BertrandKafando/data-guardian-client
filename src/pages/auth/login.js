@@ -51,7 +51,7 @@ const Page = () => {
       }
     }
   });
-  
+
 
   const handleMethodChange = useCallback(
     (event, value) => {
@@ -153,16 +153,6 @@ const Page = () => {
                 >
                  Se connecter
                 </Button>
-              
-                <Alert
-                  color="primary"
-                  severity="info"
-                  sx={{ mt: 3 }}
-                >
-                  <div>
-                    You can use <b>amadou</b> and password <b>123456</b>
-                  </div>
-                </Alert>
               </form>
     
           </div>

@@ -9,14 +9,6 @@ import {
   Typography
 } from '@mui/material';
 
-const user = {
-  avatar: '/assets/avatars/avatar-anika-visser.png',
-  city: 'Los Angeles',
-  country: 'USA',
-  jobTitle: 'Senior Developer',
-  name: 'Anika Visser',
-  timezone: 'GTM-7'
-};
 
 export const AccountProfile = (props) => {
   const {userInfo} = props;
@@ -32,7 +24,7 @@ export const AccountProfile = (props) => {
         }}
       >
         <Avatar
-          src={user.avatar}
+          src='/assets/avatars/avatar.png'
           sx={{
             height: 80,
             mb: 2,
