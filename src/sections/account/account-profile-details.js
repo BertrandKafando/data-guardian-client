@@ -8,8 +8,10 @@ import {
   CardHeader,
   Divider,
   TextField,
-  Unstable_Grid2 as Grid
+  Unstable_Grid2 as Grid,
+  Alert
 } from '@mui/material';
+import { updateUserInfo } from 'src/api/auth.service';
 
 const states = [
   {
@@ -30,15 +32,13 @@ const states = [
   }
 ];
 
-export const AccountProfileDetails = () => {
-  const [values, setValues] = useState({
-    firstName: 'Anika',
-    lastName: 'Visser',
-    email: 'demo@devias.io',
-    phone: '',
-    state: 'los-angeles',
-    country: 'USA'
-  });
+export const AccountProfileDetails = (props) => {
+
+  const {userInfo, setUserInfo} = props;
+  const [values, setValues] = useState(userInfo);
+
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = useCallback(
     (event) => {
@@ -46,16 +46,38 @@ export const AccountProfileDetails = () => {
         ...prevState,
         [event.target.name]: event.target.value
       }));
+      setError(false);
+      setSuccess(false);
     },
     []
   );
 
-  const handleSubmit = useCallback(
+  const handleChangeIdentifiant = useCallback(
     (event) => {
-      event.preventDefault();
+      setError(false);
+      setSuccess(false);
+      setValues((prevState) => ({
+        ...prevState,
+        compte: {
+          ...userInfo.compte,
+          identifiant: event.target.value
+        }
+      }));
+      setError(false);
+      setSuccess(false);
     },
     []
   );
+
+  const handleSubmit = async(e) =>{
+    e.preventDefault();
+    await updateUserInfo(values).then((response)=>{
+      setUserInfo(response);
+      setSuccess("Profile mis à jour");
+    }).catch((error)=>{
+      setError(error?.response?.data);
+    })
+  }
 
   return (
     <form
@@ -65,11 +87,19 @@ export const AccountProfileDetails = () => {
     >
       <Card>
         <CardHeader
-          subheader="The information can be edited"
+          subheader="les informations peuvent être modifier"
           title="Profile"
         />
         <CardContent sx={{ pt: 0 }}>
           <Box sx={{ m: -1.5 }}>
+            {error && (
+            <Alert severity='error' >{error}</Alert>
+
+            )}
+             {success && (
+            <Alert severity='success' >{success}</Alert>
+
+            )}
             <Grid
               container
               spacing={3}
@@ -80,12 +110,11 @@ export const AccountProfileDetails = () => {
               >
                 <TextField
                   fullWidth
-                  helperText="Please specify the first name"
-                  label="First name"
-                  name="firstName"
+                  label="Prénom"
+                  name="prenom"
                   onChange={handleChange}
                   required
-                  value={values.firstName}
+                  value={values.prenom}
                 />
               </Grid>
               <Grid
@@ -94,20 +123,35 @@ export const AccountProfileDetails = () => {
               >
                 <TextField
                   fullWidth
-                  label="Last name"
-                  name="lastName"
+                  label="Nom"
+                  name="nom"
                   onChange={handleChange}
                   required
-                  value={values.lastName}
+                  value={values.nom}
                 />
               </Grid>
+             
               <Grid
                 xs={12}
                 md={6}
               >
                 <TextField
                   fullWidth
-                  label="Email Address"
+                  label="Identifiant"
+                  name="identifiant"
+                  onChange={handleChangeIdentifiant}
+                  required
+                  value={values.compte.identifiant}
+                />
+              </Grid>
+
+              <Grid
+                xs={12}
+                md={6}
+              >
+                <TextField
+                  fullWidth
+                  label="Adresse e-mail"
                   name="email"
                   onChange={handleChange}
                   required
@@ -120,11 +164,11 @@ export const AccountProfileDetails = () => {
               >
                 <TextField
                   fullWidth
-                  label="Phone Number"
-                  name="phone"
+                  label="Numéro de téléphone"
+                  name="telephone"
                   onChange={handleChange}
                   type="number"
-                  value={values.phone}
+                  value={values.telephone}
                 />
               </Grid>
               <Grid
@@ -133,44 +177,24 @@ export const AccountProfileDetails = () => {
               >
                 <TextField
                   fullWidth
-                  label="Country"
-                  name="country"
+                  label="Organisation"
+                  name="organisation"
                   onChange={handleChange}
                   required
-                  value={values.country}
+                  value={values.organisation}
                 />
               </Grid>
               <Grid
                 xs={12}
                 md={6}
               >
-                <TextField
-                  fullWidth
-                  label="Select State"
-                  name="state"
-                  onChange={handleChange}
-                  required
-                  select
-                  SelectProps={{ native: true }}
-                  value={values.state}
-                >
-                  {states.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </TextField>
               </Grid>
             </Grid>
           </Box>
         </CardContent>
-        <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained">
-            Save details
+          <Button type='submit' variant="contained">
+            Enregistrer
           </Button>
         </CardActions>
       </Card>

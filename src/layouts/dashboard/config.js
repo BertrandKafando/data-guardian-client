@@ -38,24 +38,6 @@ export const items = [
 
   },
   {
-    title: 'Se connecter',
-    path: '/auth/login',
-    icon: (
-      <SvgIcon fontSize="small">
-        <LockClosedIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'S\'inscrire',
-    path: '/auth/register',
-    icon: (
-      <SvgIcon fontSize="small">
-        <UserPlusIcon />
-      </SvgIcon>
-    )
-  },
-  {
     title: 'Paramètres',
     path: '/settings',
     icon: (

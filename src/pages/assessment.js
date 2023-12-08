@@ -38,14 +38,15 @@ const Page = () => {
   };
 
   const processCSV = (str) => {
-    Papa.parse(str, {
-      complete: (result) => {
-        const rows = result.data;
-        setCsvArray(rows);
-      },
-      header: false, // Assuming no header row in the CSV
-    });
-  };
+  Papa.parse(str, {
+    complete: (result) => {
+      const rows = result.data;
+      setCsvArray(rows);
+    },
+    header: false, // Assuming no header row in the CSV
+    delimiter: ";" // Fix the typo here
+  });
+};
 
 
   const handleOpenModal = () => {

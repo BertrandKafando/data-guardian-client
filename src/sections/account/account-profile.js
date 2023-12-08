@@ -18,7 +18,10 @@ const user = {
   timezone: 'GTM-7'
 };
 
-export const AccountProfile = () => (
+export const AccountProfile = (props) => {
+  const {userInfo} = props;
+
+  return (
   <Card>
     <CardContent>
       <Box
@@ -40,30 +43,23 @@ export const AccountProfile = () => (
           gutterBottom
           variant="h5"
         >
-          {user.name}
+          {userInfo.prenom} {userInfo.nom}
         </Typography>
         <Typography
           color="text.secondary"
           variant="body2"
         >
-          {user.city} {user.country}
+          @{userInfo.compte.identifiant}
         </Typography>
         <Typography
           color="text.secondary"
           variant="body2"
         >
-          {user.timezone}
+          Role: {userInfo.role.nom_role}
         </Typography>
       </Box>
     </CardContent>
     <Divider />
-    <CardActions>
-      <Button
-        fullWidth
-        variant="text"
-      >
-        Upload picture
-      </Button>
-    </CardActions>
+   
   </Card>
-);
+)};

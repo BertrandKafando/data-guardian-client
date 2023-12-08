@@ -3,12 +3,30 @@ import { Box, Container, Stack, Typography, Unstable_Grid2 as Grid } from '@mui/
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { AccountProfile } from 'src/sections/account/account-profile';
 import { AccountProfileDetails } from 'src/sections/account/account-profile-details';
+import { useAuth } from 'src/hooks/use-auth';
+import { useEffect, useState } from 'react';
+import { getUserInfo } from 'src/api/auth.service';
 
-const Page = () => (
-  <>
+
+
+const Page = () => {
+
+  const { user } = useAuth();
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    // get data from api
+     getUserInfo(user?.id).then((response)=>{
+      setUserInfo(response);
+    }).catch((error)=>{
+      console.log(error);
+    });
+  }, []);
+
+  return (<>
     <Head>
       <title>
-        Account | Devias Kit
+        Compte | Data Guardian
       </title>
     </Head>
     <Box
@@ -22,10 +40,11 @@ const Page = () => (
         <Stack spacing={3}>
           <div>
             <Typography variant="h4">
-              Account
+              Compte
             </Typography>
           </div>
-          <div>
+          {userInfo && (
+            <div>
             <Grid
               container
               spacing={3}
@@ -35,22 +54,25 @@ const Page = () => (
                 md={6}
                 lg={4}
               >
-                <AccountProfile />
+                <AccountProfile userInfo={userInfo}/>
               </Grid>
               <Grid
                 xs={12}
                 md={6}
                 lg={8}
               >
-                <AccountProfileDetails />
+                <AccountProfileDetails userInfo={userInfo} setUserInfo={setUserInfo} />
               </Grid>
             </Grid>
           </div>
+          )}
+
+         
         </Stack>
       </Container>
     </Box>
   </>
-);
+)};
 
 Page.getLayout = (page) => (
   <DashboardLayout>

@@ -47,7 +47,9 @@ const Page = () => {
 
   const getProjects =() => {
     getAllProjectsOfUser().then((response) => {
-      setProjets(response.results);
+
+      console.log(response);
+      setProjets(response?.results);
     }).catch((error) => {
       console.log("error", error);
     })
