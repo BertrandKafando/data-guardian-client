@@ -1,5 +1,7 @@
 import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon';
 import CogIcon from '@heroicons/react/24/solid/CogIcon';
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+
 import LockClosedIcon from '@heroicons/react/24/solid/LockClosedIcon';
 import UserIcon from '@heroicons/react/24/solid/UserIcon';
 import UserPlusIcon from '@heroicons/react/24/solid/UserPlusIcon';
@@ -8,7 +10,7 @@ import { SvgIcon } from '@mui/material';
 
 export const items = [
   {
-    title: 'Home',
+    title: 'Accueil',
     path: '/home',
     icon: (
       <SvgIcon fontSize="small">
@@ -17,25 +19,16 @@ export const items = [
     )
   },
   {
-    title: 'Data Assessment',
-    path: '/assessment',
+    title: 'Projets',
+    path: '/project',
     icon: (
       <SvgIcon fontSize="small">
-        <ChartBarIcon />
-      </SvgIcon>
-    )   
-  },
-  {
-    title: 'Meta data',
-    path: '/metadata',
-    icon: (
-      <SvgIcon fontSize="small">
-        <ChartBarIcon />
+        <AddCircleIcon />
       </SvgIcon>
     )
   },
   {
-    title: 'Account',
+    title: 'Compte',
     path: '/account',
     icon: (
       <SvgIcon fontSize="small">
@@ -45,7 +38,7 @@ export const items = [
 
   },
   {
-    title: 'Login',
+    title: 'Se connecter',
     path: '/auth/login',
     icon: (
       <SvgIcon fontSize="small">
@@ -54,7 +47,7 @@ export const items = [
     )
   },
   {
-    title: 'Register',
+    title: 'S\'inscrire',
     path: '/auth/register',
     icon: (
       <SvgIcon fontSize="small">
