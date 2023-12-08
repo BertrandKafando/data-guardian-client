@@ -33,12 +33,16 @@ export const sendFileAndLaunchDiagnostic = async (base64File, file, fileExtensio
       }
     }
 
+    const token = window.localStorage.getItem('token');
+
     const config = {
       headers: {
         'Content-Type': 'multipart/form-data',
-        'Authorization': 'Token 82d6f18436b8389ba0347aba8dd928ab83f5b2f1'
+        'Authorization': 'Token ' + token
       },
     };
+
+    console.log(config);
 
     const response = await productApi.post('/diagnostic/', requestData, config);
 

@@ -67,4 +67,26 @@ export const signUpRequest = async (user) => {
       
     }
   };
+
+  export const signOutRequest = async () =>{
+
+
+    const token = window.localStorage.getItem('token');
+    
+    const config = {
+      headers: {
+        'Content-Type': 'application/json', // Specify JSON content type
+        'Authorization': 'Token ' + token
+      },
+    };
+  
+    try {
+      const response = await Api.post('/logout/',{}, config);
+  
+      return response.data;
+    } catch (error) {
+
+      throw error;
+    }
+  }
   

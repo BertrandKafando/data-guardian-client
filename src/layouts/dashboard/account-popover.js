@@ -11,7 +11,7 @@ export const AccountPopover = (props) => {
 
   const { user } = useAuth();
 
-  console.log(user);
+
 
   const handleSignOut = useCallback(
     () => {
@@ -46,7 +46,7 @@ export const AccountPopover = (props) => {
           color="text.secondary"
           variant="body2"
         >
-          Anika Visser
+          {user?.name}
         </Typography>
       </Box>
       <Divider />
