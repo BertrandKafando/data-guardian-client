@@ -19,19 +19,19 @@ export const getAllProjectsOfUser = async () => {
   }
 }
 
-export const createProject = async (nom_projet, descriptif) => {
+export const createProject = async (nom_projet, descriptif, userId) => {
   try {
     const response = await productApi.post("/projet/", {
       nom_projet,
-      descriptif
+      descriptif,
+      utilisateur: userId,
     });
     return response.data;
   } catch (error) {
-    console.error("Erreur de  creation du project:", error);
+    console.error("Erreur de création du projet:", error);
     throw error;
   }
-}
-
+};
 
 
 

@@ -57,8 +57,11 @@ const Page = () => {
     })
   };
 
-const navAssessment =() =>{
-  router.push('/assessment');
+const navAssessment =(id) =>{
+  router.push({
+    pathname : '/assessment',
+    query: {id_projet : id}
+  });
 };
 
 const navResult=() =>{
@@ -241,7 +244,7 @@ const navResult=() =>{
                       <TableCell align='center'>
                         <Button type="submit" color="primary" onClick={() => handleEditProject(row)}> <SvgIcon fontSize="small"><EditCircleIcon /></SvgIcon></Button>
                         <Button type="submit" color="primary" onClick={navResult}> <SvgIcon fontSize="small"><AnalyticsIcon /></SvgIcon></Button>
-                        <Button type="submit" color="primary" onClick={ navAssessment }> <SvgIcon fontSize="small"><AddIcon /></SvgIcon></Button>
+                        <Button type="submit" color="primary" onClick={() => navAssessment(row.id) }> <SvgIcon fontSize="small"><AddIcon /></SvgIcon></Button>
                         <Button type="submit" color="primary" onClick={() => handleDeleteProject(row.id)}> <SvgIcon fontSize="small"><DeleteIcon /></SvgIcon></Button>
 
                       </TableCell>

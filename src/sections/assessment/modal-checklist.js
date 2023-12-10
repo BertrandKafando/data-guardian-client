@@ -9,10 +9,12 @@ import { useRouter } from "next/router";
  
  export const ModalChecklist = (props) => {
 
-    const {setOpenModal, openModal, fileToSend} = props;
+    const {setOpenModal, openModal, fileToSend, id_projet} = props;
     const [loading, setLoading] = useState(false);
     const [messageError, setMessageError] = useState(null);
     const [finishDiagnostic, setFinishDiagnostic] = useState(false);
+
+    const [diagnostic, setDiagnostic] = useState(null);
 
     const [checkboxValues, setCheckboxValues] = useState({
         VAL_MANQ: false,
@@ -87,9 +89,10 @@ import { useRouter } from "next/router";
         if (selectedOption.length == 1){
 
         
-            sendFileAndLaunchDiagnostic(fileToSend, "CSV", selectedOption[0]).then((response)=> {
+            sendFileAndLaunchDiagnostic(fileToSend, "CSV", selectedOption[0], id_projet).then((response)=> {
 
                 setFinishDiagnostic(true);
+                setDiagnostic(response.diagnostic);
                 console.log(response);
 
                 setLoading(false);
@@ -108,7 +111,16 @@ import { useRouter } from "next/router";
 
       // view diagnostic
       const navResult=() =>{
-        router.push('/metadata');
+
+        if(diagnostic != null){
+          router.push({
+            pathname: '/metadata',
+            query: {
+              bd_id : diagnostic.base_de_donnees.id
+            }
+          });
+
+        }
       }
       
     

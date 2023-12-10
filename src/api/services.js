@@ -17,7 +17,7 @@ export const sendCSV = async (file) => {
 };
 
 
-export const sendFileAndLaunchDiagnostic = async (file, fileExtension, option) => {
+export const sendFileAndLaunchDiagnostic = async (file, fileExtension, option, id_projet) => {
   try {
 
     const requestData = {
@@ -29,7 +29,8 @@ export const sendFileAndLaunchDiagnostic = async (file, fileExtension, option) =
         format_fichier: "Tabulaire",
         separateur: "Virgule",
         avec_entete: true,
-        fichier_bd: file
+        fichier_bd: file,
+        projet: id_projet
       }
     }
 

@@ -10,8 +10,13 @@ import {sendCSV } from "src/api/services";
 import { DataCard } from "src/sections/assessment/data-card";
 import ReplyIcon from '@mui/icons-material/Reply';
 import { ModalChecklist } from "src/sections/assessment/modal-checklist";
+import { useRouter } from "next/router";
 
-const Page = () => {
+const Page = (props) => {
+
+  const router = useRouter();
+  const { id_projet } = router.query;
+
   const [csvArray, setCsvArray] = useState([]);
   const [fileToSend, setFileToSend] = useState(null);
   const [openModal, setOpenModal] = useState(false);
@@ -160,7 +165,7 @@ const Page = () => {
           {csvArray.length > 0 && <DataCard data={csvArray} />} 
         </Container>
 
-       <ModalChecklist setOpenModal={setOpenModal} openModal={openModal} fileToSend={fileToSend} />
+       <ModalChecklist setOpenModal={setOpenModal} openModal={openModal} fileToSend={fileToSend}  id_projet={id_projet} />
       </Box>
     </>
   );
