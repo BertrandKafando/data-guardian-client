@@ -1,13 +1,13 @@
 import React, { useState , useEffect } from 'react';
 import Head from 'next/head';
-import { Box, Container, Grid, Select, MenuItem , Typography,InputLabel} from '@mui/material';
-
+import { Box, Container, Grid, Select, MenuItem , Typography} from '@mui/material';
 import Pagination from '@mui/material/Pagination';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { MetaTable } from 'src/sections/metadata/metadata-meta-table';
 import { MetaColonne } from 'src/sections/metadata/metadata-meta-colonne';
 import { select } from 'd3';
 import * as d3 from 'd3';
+import Chart from 'chart.js/auto';
 
 const Page = () => {
   const itemsPerPage = 3;
@@ -556,7 +556,125 @@ const Page = () => {
   const colonneEndIndex = colonneStartIndex + itemsPerPage;
 
   const [selectedTableId, setSelectedTableId] = useState(null);
+  const [selectedColumnName, setSelectedColumnName] = useState(null);
   const [selectedTableInfo, setSelectedTableInfo] = useState(null);
+
+  const handleColumnSelect = (event) => {
+    const columnName = event.target.value;
+    setSelectedColumnName(columnName);
+  };
+
+  useEffect(() => {
+    if (selectedTableId !== null && selectedColumnName !== null) {
+      const selectedMetaColonne = metaColonneData.find(
+        (metaColonne) =>
+          metaColonne.id_meta_table === selectedTableId &&
+          metaColonne.nom_colonne === selectedColumnName
+      );
+  
+      // Vérifier si selectedMetaColonne est défini
+      if (selectedMetaColonne) {
+        const barGraphData = [
+          {
+            label: 'Existing value',
+            value: selectedMetaColonne.nombre_valeur,
+          },
+          {
+            label: 'Anomaly',
+            value: selectedMetaColonne.nombre_anomalie,
+          },
+          {
+            label: 'Missing value',
+            value: selectedMetaColonne.nombre_valeur_manquante,
+          },
+          {
+            label: 'Valid value',
+            value:
+              selectedMetaColonne.nombre_valeur -
+              (selectedMetaColonne.nombre_anomalie -
+                selectedMetaColonne.nombre_valeur_manquante),
+          },
+          {
+            label: 'Invalid value',
+            value:
+              selectedMetaColonne.nombre_anomalie -
+              selectedMetaColonne.nombre_valeur_manquante,
+          },
+        ];
+  
+        createBarGraph(barGraphData);
+      }
+    }
+  }, [selectedTableId, selectedColumnName]);
+
+
+  const createBarGraph = (data) => {
+    d3.select('#bar-graph-container').select('svg').remove();
+  
+    renderTitle('Bar Graph');
+  
+    const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+    const width = 600 - margin.left - margin.right;
+    const height = 300 - margin.top - margin.bottom;
+  
+    // Define a color scale for each bar
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+  
+    const xScale = d3
+      .scaleBand()
+      .domain(data.map((d) => d.label))
+      .range([margin.left, width - margin.right])
+      .padding(0.1);
+  
+    const yScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, (d) => d.value)])
+      .range([height - margin.bottom, margin.top]);
+  
+    const svg = d3
+      .select('#bar-graph-container')
+      .append('svg')
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+      .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+  
+    svg
+      .selectAll('rect')
+      .data(data)
+      .enter()
+      .append('rect')
+      .attr('x', (d) => xScale(d.label))
+      .attr('y', (d) => yScale(d.value))
+      .attr('width', xScale.bandwidth())
+      .attr('height', (d) => height - margin.bottom - yScale(d.value))
+      .attr('fill', (d, i) => colorScale(i)); // Use color scale for different colors
+  
+    svg
+      .selectAll('text')
+      .data(data)
+      .enter()
+      .append('text')
+      .text((d) => d.value) // Display the value on top of each bar
+      .attr('x', (d) => xScale(d.label) + xScale.bandwidth() / 2)
+      .attr('y', (d) => yScale(d.value) - 5)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', '12px')
+      .attr('fill', 'black'); // Adjust the color as needed
+  
+    // Add X axis
+    svg
+      .append('g')
+      .attr('transform', `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(xScale));
+  
+    // Add Y axis
+    svg
+      .append('g')
+      .attr('transform', `translate(${margin.left},0)`)
+      .call(d3.axisLeft(yScale));
+  };
+  
 
 
   // Function to handle table selection
@@ -572,23 +690,40 @@ const Page = () => {
 
   useEffect(() => {
     if (selectedTableId !== null) {
-      const selectedMetaTable = metaColonneData.find(
-        (metaTable) => metaTable.id_meta_table === selectedTableId
+      const selectedMetaTable = metaTableData.find(
+        (metaTable) => metaTable.id === selectedTableId
+      );
+
+      const filteredMetaColonne = metaColonneData.filter(
+        (metaColonne) => metaColonne.id_meta_table === selectedTableId
       );
 
       const circleGraphData = {
-        nombre_valeur: selectedMetaTable.nombre_valeur,
-        nombre_valeur_manquante: selectedMetaTable.nombre_valeur_manquante,
+        nombre_valeur: d3.sum(
+          filteredMetaColonne,
+          (d) => d.nombre_valeur - d.nombre_valeur_manquante
+        ),
+        nombre_valeur_manquante: d3.sum(
+          filteredMetaColonne,
+          (d) => d.nombre_valeur_manquante
+        ),
       };
 
       const anomaliesGraphData = {
-        nombre_valeur: selectedMetaTable.nombre_valeur,
-        nombre_anomalie: selectedMetaTable.nombre_anomalie,
+        nombre_valeur: d3.sum(filteredMetaColonne, (d) => d.nombre_valeur),
+        nombre_anomalie: d3.sum(filteredMetaColonne, (d) => d.nombre_anomalie),
       };
 
       const invalidValuesGraphData = {
-        nombre_anomalie_manquante: selectedMetaTable.nombre_anomalie - selectedMetaTable.nombre_valeur_manquante,
-        nombre_valide: selectedMetaTable.nombre_valeur - (selectedMetaTable.nombre_anomalie - selectedMetaTable.nombre_valeur_manquante),
+        nombre_anomalie_manquante: d3.sum(
+          filteredMetaColonne,
+          (d) => d.nombre_anomalie - d.nombre_valeur_manquante
+        ),
+        nombre_valide: d3.sum(
+          filteredMetaColonne,
+          (d) =>
+            d.nombre_valeur - (d.nombre_anomalie - d.nombre_valeur_manquante)
+        ),
       };
 
       createCircleGraph(circleGraphData);
@@ -745,7 +880,7 @@ const Page = () => {
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Container maxWidth="xl">
           <Grid container spacing={3}>
-            <Grid xs={12} md={12} lg={12}>
+          <Grid xs={12} md={12} lg={12}>
               <MetaTable
                 columnsNames={[
                   'ID',
@@ -800,6 +935,28 @@ const Page = () => {
             <Grid item xs={12} md={4} lg={4}>
               {selectedTableInfo && renderTitle(selectedTableInfo.title3)} 
               <Box id="invalid-values-graph-container"></Box>
+            </Grid>
+            <Grid item xs={12} md={12} lg={12}>
+              {selectedTableId && (
+                <>
+                  <Typography variant="h6" gutterBottom>
+                    Statistique par colonne
+                  </Typography>
+                  <h10>Sélectionner une colonne</h10>
+                  <Select value={selectedColumnName} onChange={handleColumnSelect}>
+                    {metaColonneData
+                      .filter((colonne) => colonne.id_meta_table === selectedTableId)
+                      .map((colonne) => (
+                        <MenuItem key={colonne.id_meta_colonne} value={colonne.nom_colonne}>
+                          {colonne.nom_colonne}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </>
+              )}
+            </Grid>
+            <Grid item xs={12} md={12} lg={12}>
+              <Box id="bar-graph-container"></Box>
             </Grid>
           </Grid>
         </Container>

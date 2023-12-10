@@ -91,21 +91,6 @@ export const MetaTable = (props) => {
       </Scrollbar>
       <Divider />
       <CardActions sx={{ justifyContent: 'space-between' }}>
-        <Typography>{data.length} lignes au total</Typography>
-        <Button
-            color="inherit"
-            endIcon={(
-            <SvgIcon fontSize="small">
-                <ArrowRightIcon />
-            </SvgIcon>
-            )}
-            size="small"
-            variant="text"
-
-            onClick={handleOpen}
-        >
-            Voir tous
-        </Button>
     </CardActions>
     </Card>
     <Modal
@@ -160,15 +145,6 @@ export const MetaTable = (props) => {
           </TableBody>
         </Table>
       </TableContainer>
-        <Box sx={modalHeaderStyle}>
-            <Typography>{data.length} lignes au total</Typography>
-            <Button
-                color="inherit"
-                onClick={handleClose}
-            >
-            Fermer
-          </Button>
-        </Box>
       </Box>
       
      
