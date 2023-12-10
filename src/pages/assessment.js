@@ -31,7 +31,8 @@ const Page = () => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const text = reader.result;
-      processCSV(text);
+      // processCSV(text);
+      parseFile(text, ";", false);
     };
 
     reader.readAsText(file);
@@ -46,7 +47,36 @@ const Page = () => {
     header: false, // Assuming no header row in the CSV
     delimiter: ";" // Fix the typo here
   });
-};
+  };
+  
+  const parseFile = (file, sep, header = false) => {
+    let data = [];
+    try {
+      const lines = file.split('\n');
+      if (header) {
+        lines.shift(); // Exclude header if present
+      }
+
+      let incompleteLine = '';
+      for (let idx = 0; idx < lines.length; idx++) {
+        let line = lines[idx].trim();
+        line = line.substring(1, line.length - 2);
+        const row = line.split(sep);
+        if (idx !== 0 && row.length < data[0].length) {
+          // Add the incomplete part to the last read line
+          data[data.length - 1][data[data.length - 1].length - 1] += ` ${line}`;
+        } else {
+          data.push(row);
+        }
+      }
+
+      setCsvArray(data); // Returning object with columns as keys and arrays as values
+    } catch (e) {
+      console.log(`Error parsing file: ${e}`);
+      return -1;
+    }
+  };
+
 
 
   const handleOpenModal = () => {
