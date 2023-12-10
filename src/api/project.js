@@ -9,6 +9,8 @@ export const productApi = axios.create({
 
 export const getAllProjectsOfUser = async () => {
   try {
+
+   
     const response = await productApi.get("/projet/");
     return response.data;
   } catch (error) {

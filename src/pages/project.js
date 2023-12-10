@@ -19,11 +19,13 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContentText from '@mui/material/DialogContentText';
 import TextField from '@mui/material/TextField';
 import { useRouter } from 'next/navigation';
+import { useAuth } from 'src/hooks/use-auth';
 
 
 
 
 const Page = () => {
+  const {user} = useAuth();
   const [projets, setProjets] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [projectData, setProjectData] = useState({ nom_projet: '', descriptif: '' });
@@ -84,7 +86,7 @@ const navResult=() =>{
   const handleSaveProject = async () => {
     try {
       
-      const createdProject = await createProject(projectData.nom_projet, projectData.descriptif);
+      const createdProject = await createProject(projectData.nom_projet, projectData.descriptif, user.id);
   
       setIsDialogOpen(false);
   

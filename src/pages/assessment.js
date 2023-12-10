@@ -44,7 +44,6 @@ const Page = () => {
       setCsvArray(rows);
     },
     header: false, // Assuming no header row in the CSV
-    delimiter: ";" // Fix the typo here
   });
 };
 
