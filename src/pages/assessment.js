@@ -22,7 +22,7 @@ const Page = (props) => {
   const [fileToSend, setFileToSend] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [errorFileIsEmpty, setErrorFileIsEmpty] = useState(false);
-  const [delimeter, setDelimeter] = useState(";");
+  const [delimeter, setDelimeter] = useState("Point virgule");
   const [header, setHeader] = useState(false); 
   const [text, setText] = useState("");
   const [extension, setExtension] = useState("");
@@ -189,45 +189,54 @@ const Page = (props) => {
             
             <Upload handleFileUpload={handleFileUpload} />
           </Stack>
+
+          {fileToSend && (
+
+            <Stack
+              direction="row"
+              divider={<Divider orientation="vertical" flexItem />}
+              spacing={10}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginTop: 2
+              }}
+
+            >
+              <Box sx={{ minWidth: 120 }}>
+                <Typography variant="body1" align="center" sx={{ fontWeight: 600 }}>Délimiteur</Typography>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={delimeter}
+                  label="Age"
+                  onChange={handleDelimeter}
+                >
+                  {Object.keys(delimeters).map((key) => (
+                    <MenuItem key={key} value={key}  >{key + "  " + delimeters[key]}</MenuItem>
+                  ))}
+                </Select>
+              </Box>
+
+              <Box sx={{ minWidth: 120 }}>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>Header</Typography>
+                <Checkbox
+                  checked={header}
+                  onChange={handleHeader}
+                  inputProps={{ 'aria-label': 'controlled' }}
+                />
+              </Box>
+
+
+            </Stack>
+
+          )}
           
           <Stack
-            direction="row"
-            divider={<Divider orientation="vertical" flexItem />}
-            spacing={10}
             sx={{
-              display: 'flex',
-              justifyContent: 'center',
               marginTop: 2
             }}
           >
-            <Box sx={{ minWidth: 120 }}>
-              <Typography variant="body1" align="center" sx={{ fontWeight: 600 }}>Délimiteur</Typography>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={delimeter}
-                label="Age"
-                onChange={handleDelimeter}
-              >
-                {Object.keys(delimeters).map((key) => (
-                  <MenuItem key={key} value={key}  >{key + "  " + delimeters[key]}</MenuItem>
-                ))}
-              </Select>
-            </Box>
-
-            <Box sx={{ minWidth: 120 }}>
-              <Typography variant="body1" sx={{ fontWeight: 600 }}>Header</Typography>
-              <Checkbox
-                checked={header}
-                onChange={handleHeader}
-                inputProps={{ 'aria-label': 'controlled' }}
-              />
-            </Box>
-      
-   
-          </Stack>
-
-          <Stack>
             {csvArray.length > 0 && <DataCard data={csvArray} />} 
           </Stack>
         </Container>
