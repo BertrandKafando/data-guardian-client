@@ -17,18 +17,18 @@ export const sendCSV = async (file) => {
 };
 
 
-export const sendFileAndLaunchDiagnostic = async (file, fileExtension, option, id_projet) => {
+export const sendFileAndLaunchDiagnostic = async (file, option, id_projet,delimeter,header) => {
   try {
 
     const requestData = {
       parametre_diagnostic: option,
       base_de_donnees: {
-        nom_base_de_donnees: "bdd2",
-        type_fichier: fileExtension,
-        nom_fichier: "string",
+        nom_base_de_donnees: "define_inbackend",
+        type_fichier: "CSV", // look in fichier bd
+        nom_fichier: "look in fichier bd",
         format_fichier: "Tabulaire",
-        separateur: "Virgule",
-        avec_entete: true,
+        separateur: delimeter,
+        avec_entete: header,
         fichier_bd: file,
         projet: id_projet
       }

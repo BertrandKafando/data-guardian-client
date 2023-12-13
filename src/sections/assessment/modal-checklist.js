@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
  
  export const ModalChecklist = (props) => {
 
-    const {setOpenModal, openModal, fileToSend, id_projet} = props;
+   const { setOpenModal, openModal, fileToSend, id_projet, delimeter, header } = props;
     const [loading, setLoading] = useState(false);
     const [messageError, setMessageError] = useState(null);
     const [finishDiagnostic, setFinishDiagnostic] = useState(false);
@@ -89,7 +89,7 @@ import { useRouter } from "next/router";
         if (selectedOption.length == 1){
 
         
-            sendFileAndLaunchDiagnostic(fileToSend, "CSV", selectedOption[0], id_projet).then((response)=> {
+            sendFileAndLaunchDiagnostic(fileToSend,selectedOption[0], id_projet,delimeter,header).then((response)=> {
 
                 setFinishDiagnostic(true);
                 setDiagnostic(response.diagnostic);

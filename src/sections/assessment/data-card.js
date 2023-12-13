@@ -76,13 +76,13 @@ export const DataCard = (props) => {
           <Box sx={modalHeaderStyle}>
             <Typography variant="h6">Data Card</Typography>
           </Box>
-          <TableContainer sx={{ flex: 1, overflow: 'auto', bgcolor: 'white', padding: 5, paddingTop: 0, zIndex: 999 }}>
+          <TableContainer sx={{ flex: 1, overflow: 'hidden', bgcolor: 'white', padding: 5, paddingTop: 0, zIndex: 999 }}>
             <Table>
               <TableBody>
                 {data.map((row, rowIndex) => (
                   <TableRow hover key={rowIndex}>
                     {row.map((cell, cellIndex) => (
-                      <TableCell key={cellIndex}>{cell}</TableCell>
+                      <TableCell key={cellIndex} >{cell}</TableCell>
                     ))}
                   </TableRow>
                 ))}

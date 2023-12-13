@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import { Alert, Box, Button, Container, Stack, SvgIcon, Typography } from "@mui/material";
+import { Alert, Box, Button, Container, Stack, SvgIcon, Typography, Item, Divider, Paper,Select,MenuItem,Checkbox } from "@mui/material";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import Head from "next/head";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import Upload from "src/sections/upload";
-import Papa from "papaparse";
-import { send } from "process";
 import {sendCSV } from "src/api/services";
 import { DataCard } from "src/sections/assessment/data-card";
 import ReplyIcon from '@mui/icons-material/Reply';
@@ -17,16 +15,27 @@ const Page = (props) => {
   const router = useRouter();
   const { id_projet } = router.query;
 
+  const delimeters = { "Virgule": ",", "Point virgule": ";", "Tabulation": "\t"};
+
+
   const [csvArray, setCsvArray] = useState([]);
   const [fileToSend, setFileToSend] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [errorFileIsEmpty, setErrorFileIsEmpty] = useState(false);
+  const [delimeter, setDelimeter] = useState(";");
+  const [header, setHeader] = useState(false); 
+  const [text, setText] = useState("");
+  const [extension, setExtension] = useState("");
+
 
 
 
   const handleFileUpload = (event) => {
     event.preventDefault();
     const file = event.target.files[0];
+    // get extension of file
+
+    setExtension(file.name.split('.').pop());
     if (file == null || file == undefined || !file["name"]) {
       console.log("file is null");
       return;
@@ -36,24 +45,56 @@ const Page = (props) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const text = reader.result;
+      setText(text);
       // processCSV(text);
-      parseFile(text, ";", false);
+      parseAllFile();
     };
 
     reader.readAsText(file);
   };
 
-  const processCSV = (str) => {
-  Papa.parse(str, {
-    complete: (result) => {
-      const rows = result.data;
-      setCsvArray(rows);
-    },
-    header: false, // Assuming no header row in the CSV
-  });
+
+
+  const parseAllFile = () => {
+    if (extension == "csv" || extension == "txt") {
+      parseFile(text, delimeters[delimeter], header);
+    }
+    else if (extension == "xlsx" || extension == "xls") {
+      setCsvArray([]);
+    }
+    else if (extension == "json") {
+      setCsvArray([]);
+    }
+    else {
+      setCsvArray([]);
+      setErrorFileIsEmpty(true);
+    }
+  }
+
+
+
+
+
+  const handleDelimeter = (event) => {
+    if (fileToSend == null) {
+      setErrorFileIsEmpty(true);
+      return;
+    }
+    setDelimeter(event.target.value);
+    console.log(event.target.value);
+    parseFile(text, delimeters[event.target.value], header);
+  };
+
+  const handleHeader = (event) => {
+    if (fileToSend == null) {
+      setErrorFileIsEmpty(true);
+      return;
+    }
+    setHeader(event.target.checked);
+    parseFile(text, delimeters[delimeter], event.target.checked);
   };
   
-  const parseFile = (file, sep, header = false) => {
+  const parseFile = (file, sep, header) => {
     let data = [];
     try {
       const lines = file.split('\n');
@@ -64,11 +105,14 @@ const Page = (props) => {
       let incompleteLine = '';
       for (let idx = 0; idx < lines.length; idx++) {
         let line = lines[idx].trim();
-        line = line.substring(1, line.length - 2);
+        //line = line.substring(1, line.length - 2);
         const row = line.split(sep);
         if (idx !== 0 && row.length < data[0].length) {
           // Add the incomplete part to the last read line
-          data[data.length - 1][data[data.length - 1].length - 1] += ` ${line}`;
+          let temp1 = data[data.length - 1][data[data.length - 1].length - 1];
+          let temp2 = ` ${line}`
+          // temp1[:-1] + temp2[2:-1]
+          data[data.length - 1][data[data.length - 1].length - 1] =  temp1.substring(0, temp1.length - 1) + temp2.substring(2, temp2.length - 1);
         } else {
           data.push(row);
         }
@@ -97,22 +141,6 @@ const Page = (props) => {
   const handleClearCSV = () =>{
     setCsvArray([]);
     setFileToSend(null);
-  }
-
-
-  const handsendCSV = (file) => {
-    // test if file exist 
-    if (file == null || file == undefined || !file["name"]) {
-      console.log("file is null");
-      return;
-    }
-    sendCSV(file).then((response) => {
-      console.log(response);
-      //get statistiques
-    }),
-      (error) => {
-        console.log(error);
-      };
   }
 
   return (
@@ -161,11 +189,50 @@ const Page = (props) => {
             
             <Upload handleFileUpload={handleFileUpload} />
           </Stack>
+          
+          <Stack
+            direction="row"
+            divider={<Divider orientation="vertical" flexItem />}
+            spacing={10}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: 2
+            }}
+          >
+            <Box sx={{ minWidth: 120 }}>
+              <Typography variant="body1" align="center" sx={{ fontWeight: 600 }}>Délimiteur</Typography>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={delimeter}
+                label="Age"
+                onChange={handleDelimeter}
+              >
+                {Object.keys(delimeters).map((key) => (
+                  <MenuItem key={key} value={key}  >{key + "  " + delimeters[key]}</MenuItem>
+                ))}
+              </Select>
+            </Box>
 
-          {csvArray.length > 0 && <DataCard data={csvArray} />} 
+            <Box sx={{ minWidth: 120 }}>
+              <Typography variant="body1" sx={{ fontWeight: 600 }}>Header</Typography>
+              <Checkbox
+                checked={header}
+                onChange={handleHeader}
+                inputProps={{ 'aria-label': 'controlled' }}
+              />
+            </Box>
+      
+   
+          </Stack>
+
+          <Stack>
+            {csvArray.length > 0 && <DataCard data={csvArray} />} 
+          </Stack>
         </Container>
 
-       <ModalChecklist setOpenModal={setOpenModal} openModal={openModal} fileToSend={fileToSend}  id_projet={id_projet} />
+       <ModalChecklist setOpenModal={setOpenModal} openModal={openModal} fileToSend={fileToSend}  id_projet={id_projet}  delimeter ={delimeter} header ={header} />
       </Box>
     </>
   );
