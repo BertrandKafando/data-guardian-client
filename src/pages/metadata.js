@@ -1,6 +1,6 @@
 import React, { useState , useEffect } from 'react';
 import Head from 'next/head';
-import { Box, Container, Grid, Select, MenuItem , Typography} from '@mui/material';
+import { Box, Container, Grid, Select, MenuItem , Typography, Card, CardHeader, CardContent} from '@mui/material';
 import Pagination from '@mui/material/Pagination';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { MetaTable } from 'src/sections/metadata/metadata-meta-table';
@@ -8,538 +8,549 @@ import { MetaColonne } from 'src/sections/metadata/metadata-meta-colonne';
 import { select } from 'd3';
 import * as d3 from 'd3';
 import Chart from 'chart.js/auto';
+import { getMetaColonne, getMetaTable } from 'src/api/metadata.service';
+import { useRouter } from 'next/router';
+import PieGraph from 'src/sections/metadata/pie-graph';
+import { height, width } from '@mui/system';
 
 const Page = () => {
-  const itemsPerPage = 3;
+  const itemsPerPage = 5;
   const [currentTablePage, setCurrentTablePage] = useState(1);
   const [currentColonnePage, setCurrentColonnePage] = useState(1);
+  const [metaTableData, setMetaTableData] = useState([]);
+  const [metaColonneData, setMetaColonneData] = useState([]);
+  const [nombreValeurs, setNombreValeurs] = useState(0);
 
-  const metaTableData = [
-    {
-      id: 1,
-      nom_table: 'CLIENTS',
-      nombre_colonne: 10,
-      nombre_ligne: 124,
-      date_creation: "2023-11-18",
-      date_diagnostic:"2023-11-21"
-    },
-    {
-      id: 2,
-      nom_table: 'MAGASIN',
-      nombre_colonne: 5,
-      nombre_ligne: 12,
-      date_creation: "2023-11-18",
-      date_diagnostic:"2023-11-21"
-    },
-    {
-      id: 3,
-      nom_table: 'ARTICLES',
-      nombre_colonne: 8,
-      nombre_ligne: 548,
-      date_creation: "2023-11-18",
-      date_diagnostic:"2023-11-21"
-    },
-    {
-      id: 3,
-      nom_table: 'ARTICLES',
-      nombre_colonne: 8,
-      nombre_ligne: 548,
-      date_creation: "2023-11-18",
-      date_diagnostic:"2023-11-21"
-    },
-    {
-      id: 3,
-      nom_table: 'ARTICLES',
-      nombre_colonne: 8,
-      nombre_ligne: 548,
-      date_creation: "2023-11-18",
-      date_diagnostic:"2023-11-21"
-    },
-    {
-      id: 3,
-      nom_table: 'ARTICLES',
-      nombre_colonne: 8,
-      nombre_ligne: 548,
-      date_creation: "2023-11-18",
-      date_diagnostic:"2023-11-21"
-    },
-    {
-      id: 3,
-      nom_table: 'ARTICLES',
-      nombre_colonne: 8,
-      nombre_ligne: 548,
-      date_creation: "2023-11-18",
-      date_diagnostic:"2023-11-21"
-    },
-    {
-      id: 3,
-      nom_table: 'ARTICLES',
-      nombre_colonne: 8,
-      nombre_ligne: 548,
-      date_creation: "2023-11-18",
-      date_diagnostic:"2023-11-21"
-    },
-    {
-      id: 3,
-      nom_table: 'ARTICLES',
-      nombre_colonne: 8,
-      nombre_ligne: 548,
-      date_creation: "2023-11-18",
-      date_diagnostic:"2023-11-21"
-    },
-    {
-      id: 3,
-      nom_table: 'ARTICLES',
-      nombre_colonne: 8,
-      nombre_ligne: 548,
-      date_creation: "2023-11-18",
-      date_diagnostic:"2023-11-21"
-    }
-  ];
 
-  const metaColonneData = [
-    {
-      id_meta_colonne : 1,
-      id_meta_table: 1,
-      id_meta_special_car: 1, 
-      id_table_origin: "CODCLI",
-      nom_colonne: "NOMCLI",
-      type_donnee: "Varchar",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: "CD001",
-      col_max: "FG0A01"
-    },
-    {
-      id_meta_colonne :2,
-      id_meta_table: 2,
-      id_meta_special_car: 2, 
-      id_table_origin: "REFART",
-      nom_colonne: "LOCATION",
-      type_donnee: "Varchar",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 12,
-      nombre_valeur_manquante: 3,
-      nombre_outliers: 0,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 12,
-      nombre_majuscules: 12,
-      nombre_miniscules: 0,
-      nombre_initcap: 0,
-      col_min: "Dakar",
-      col_max: "Epinay sur seine"
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    },
-    {
-      id_meta_colonne : 3,
-      id_meta_table: 3,
-      id_meta_special_car: 3, 
-      id_table_origin: "REFART",
-      nom_colonne: "PRIX",
-      type_donnee: "NUMBER",
-      date_creation: "22/11/2023",
-      date_diagnostic: "22/11/2023",
-      nombre_valeur: 42,
-      nombre_valeur_manquante: 17,
-      nombre_outliers: 3,
-      semantique: null,
-      langue: "FR",
-      nombre_anomalie: 24,
-      nombre_majuscules: 24,
-      nombre_miniscules: 24,
-      nombre_initcap: 24,
-      col_min: 12.5,
-      col_max: 158.99
-    }
-  ];
+  const router = useRouter();
+  const { bd_id } = router.query;
+
+  // const metaTableData = [
+  //   {
+  //     id: 1,
+  //     nom_table: 'CLIENTS',
+  //     nombre_colonne: 10,
+  //     nombre_ligne: 124,
+  //     date_creation: "2023-11-18",
+  //     date_diagnostic:"2023-11-21"
+  //   },
+  //   {
+  //     id: 2,
+  //     nom_table: 'MAGASIN',
+  //     nombre_colonne: 5,
+  //     nombre_ligne: 12,
+  //     date_creation: "2023-11-18",
+  //     date_diagnostic:"2023-11-21"
+  //   },
+  //   {
+  //     id: 3,
+  //     nom_table: 'ARTICLES',
+  //     nombre_colonne: 8,
+  //     nombre_ligne: 548,
+  //     date_creation: "2023-11-18",
+  //     date_diagnostic:"2023-11-21"
+  //   },
+  //   {
+  //     id: 3,
+  //     nom_table: 'ARTICLES',
+  //     nombre_colonne: 8,
+  //     nombre_ligne: 548,
+  //     date_creation: "2023-11-18",
+  //     date_diagnostic:"2023-11-21"
+  //   },
+  //   {
+  //     id: 3,
+  //     nom_table: 'ARTICLES',
+  //     nombre_colonne: 8,
+  //     nombre_ligne: 548,
+  //     date_creation: "2023-11-18",
+  //     date_diagnostic:"2023-11-21"
+  //   },
+  //   {
+  //     id: 3,
+  //     nom_table: 'ARTICLES',
+  //     nombre_colonne: 8,
+  //     nombre_ligne: 548,
+  //     date_creation: "2023-11-18",
+  //     date_diagnostic:"2023-11-21"
+  //   },
+  //   {
+  //     id: 3,
+  //     nom_table: 'ARTICLES',
+  //     nombre_colonne: 8,
+  //     nombre_ligne: 548,
+  //     date_creation: "2023-11-18",
+  //     date_diagnostic:"2023-11-21"
+  //   },
+  //   {
+  //     id: 3,
+  //     nom_table: 'ARTICLES',
+  //     nombre_colonne: 8,
+  //     nombre_ligne: 548,
+  //     date_creation: "2023-11-18",
+  //     date_diagnostic:"2023-11-21"
+  //   },
+  //   {
+  //     id: 3,
+  //     nom_table: 'ARTICLES',
+  //     nombre_colonne: 8,
+  //     nombre_ligne: 548,
+  //     date_creation: "2023-11-18",
+  //     date_diagnostic:"2023-11-21"
+  //   },
+  //   {
+  //     id: 3,
+  //     nom_table: 'ARTICLES',
+  //     nombre_colonne: 8,
+  //     nombre_ligne: 548,
+  //     date_creation: "2023-11-18",
+  //     date_diagnostic:"2023-11-21"
+  //   }
+  // ];
+
+  // const metaColonneData = [
+  //   {
+  //     id_meta_colonne : 1,
+  //     id_meta_table: 1,
+  //     id_meta_special_car: 1, 
+  //     id_table_origin: "CODCLI",
+  //     nom_colonne: "NOMCLI",
+  //     type_donnee: "Varchar",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: "CD001",
+  //     col_max: "FG0A01"
+  //   },
+  //   {
+  //     id_meta_colonne :2,
+  //     id_meta_table: 2,
+  //     id_meta_special_car: 2, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "LOCATION",
+  //     type_donnee: "Varchar",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 12,
+  //     nombre_valeur_manquante: 3,
+  //     nombre_outliers: 0,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 12,
+  //     nombre_majuscules: 12,
+  //     nombre_miniscules: 0,
+  //     nombre_initcap: 0,
+  //     col_min: "Dakar",
+  //     col_max: "Epinay sur seine"
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   },
+  //   {
+  //     id_meta_colonne : 3,
+  //     id_meta_table: 3,
+  //     id_meta_special_car: 3, 
+  //     id_table_origin: "REFART",
+  //     nom_colonne: "PRIX",
+  //     type_donnee: "NUMBER",
+  //     date_creation: "22/11/2023",
+  //     date_diagnostic: "22/11/2023",
+  //     nombre_valeur: 42,
+  //     nombre_valeur_manquante: 17,
+  //     nombre_outliers: 3,
+  //     semantique: null,
+  //     langue: "FR",
+  //     nombre_anomalie: 24,
+  //     nombre_majuscules: 24,
+  //     nombre_miniscules: 24,
+  //     nombre_initcap: 24,
+  //     col_min: 12.5,
+  //     col_max: 158.99
+  //   }
+  // ];
 
   const handleChangeTablePage = (event, newPage) => {
     setCurrentTablePage(newPage);
@@ -559,12 +570,115 @@ const Page = () => {
   const [selectedColumnName, setSelectedColumnName] = useState(null);
   const [selectedTableInfo, setSelectedTableInfo] = useState(null);
 
+  const [missingValuesPieGraphData, setMissingValuesPieGraphData] = useState([]);
+  const [anomaliesPieGraphData, setAnomaliesPieGraphData] = useState([]);
+  const [invalidPieGraphData, setInvalidPieGraphData] = useState([]);
+
+  const getColumnStatistic = (metaColsData, columnName) => {
+    const columnNameData = metaColsData.filter(col => col.nom_colonne == columnName);
+
+    if (columnNameData.length > 0){
+      const selectedMetaColonne = columnNameData[0];
+      
+       const barGraphData = [
+      {
+        label: 'Anomalies',
+        value: count_anomalies(selectedMetaColonne.meta_anomalie),
+      },
+      {
+        label: 'Valeurs Manquantes',
+        value: selectedMetaColonne.nombre_valeurs_manquantes,
+      },
+      {
+        label: 'Valeurs Valides',
+        value:
+          selectedMetaColonne.nombre_valeurs -
+          (count_anomalies(selectedMetaColonne.meta_anomalie) -
+            selectedMetaColonne.nombre_valeurs_manquantes),
+      },
+      {
+        label: 'Valeurs invalides',
+        value:
+        count_anomalies(selectedMetaColonne.meta_anomalie) -
+          selectedMetaColonne.nombre_valeurs_manquantes,
+      },
+    ];
+
+  
+    createBarGraph(barGraphData);
+
+  
+    }
+  }
+
   const handleColumnSelect = (event) => {
     const columnName = event.target.value;
     setSelectedColumnName(columnName);
+
+    getColumnStatistic(metaColonneData, columnName);
+
+    
+
+     
   };
 
+  
+  const getMetaTableData = async(bd_id) => {
+    await getMetaTable(bd_id).then((data) => {
+      const meta_tables = data?.results;
+      if (meta_tables.length > 0){
+        setMetaTableData(data?.results);
+        setNombreValeurs(meta_tables[0].nombre_lignes);
+        meta_tables.forEach(async(meta_table) => {
+          await getMetaColonneData(meta_table.id, meta_tables[0].nombre_lignes);
+        });
+      }
+        
+      
+
+    }).catch((error)=>{
+      console.log(error);
+    })
+  }
+
+  const count_anomalies = (anomalies)=>{
+    let count = 0;
+    if (anomalies.length > 0){
+      anomalies.forEach(anomalie => {
+        if (anomalie.nom_anomalie == "Premiere Forme normale"){
+          if (anomalie.valeur_trouvee == 0){
+            count += 1;
+          }
+        }else{
+          count += anomalie.valeur_trouvee;
+        }
+      });
+    }
+    return count;
+  }
+
+
+  const getMetaColonneData = async(meta_table_id, nb_valeurs) => {
+    await getMetaColonne(meta_table_id).then((data) => {
+      const metacols_data = data?.results;
+      const update_metacols_data = metacols_data.map(col =>  ({...col, nombre_valeurs: nb_valeurs }));
+      setMetaColonneData(update_metacols_data);
+
+      setSelectedColumnName(update_metacols_data[0].nom_colonne);
+      getColumnStatistic(update_metacols_data, update_metacols_data[0].nom_colonne);
+
+
+    }).catch((error)=>{
+      console.log(error);
+    })
+  }
+
   useEffect(() => {
+
+    getMetaTableData(bd_id);
+
+
+
     if (selectedTableId !== null && selectedColumnName !== null) {
       const selectedMetaColonne = metaColonneData.find(
         (metaColonne) =>
@@ -574,38 +688,11 @@ const Page = () => {
   
       // Vérifier si selectedMetaColonne est défini
       if (selectedMetaColonne) {
-        const barGraphData = [
-          {
-            label: 'Existing value',
-            value: selectedMetaColonne.nombre_valeur,
-          },
-          {
-            label: 'Anomaly',
-            value: selectedMetaColonne.nombre_anomalie,
-          },
-          {
-            label: 'Missing value',
-            value: selectedMetaColonne.nombre_valeur_manquante,
-          },
-          {
-            label: 'Valid value',
-            value:
-              selectedMetaColonne.nombre_valeur -
-              (selectedMetaColonne.nombre_anomalie -
-                selectedMetaColonne.nombre_valeur_manquante),
-          },
-          {
-            label: 'Invalid value',
-            value:
-              selectedMetaColonne.nombre_anomalie -
-              selectedMetaColonne.nombre_valeur_manquante,
-          },
-        ];
-  
-        createBarGraph(barGraphData);
+       
+
       }
     }
-  }, [selectedTableId, selectedColumnName]);
+  }, []);
 
 
   const createBarGraph = (data) => {
@@ -676,198 +763,69 @@ const Page = () => {
   };
   
 
-
-  // Function to handle table selection
-  const handleTableSelect = (event) => {
-    const selectedId = event.target.value;
-    setSelectedTableId(selectedId);
-    setSelectedTableInfo({
-      title1: 'EXISTING vs MISSING values  ',
-      title2: ' ANOMALIES  ',
-      title3: 'VALID vs INVALID values   ',
-    });
-  };
-
+  // PIE GRAPHS 
   useEffect(() => {
-    if (selectedTableId !== null) {
-      const selectedMetaTable = metaTableData.find(
-        (metaTable) => metaTable.id === selectedTableId
-      );
 
+    if (metaTableData.length > 0){
       const filteredMetaColonne = metaColonneData.filter(
-        (metaColonne) => metaColonne.id_meta_table === selectedTableId
+        (metaColonne) => metaColonne.meta_table === metaTableData[0].id
       );
 
-      const circleGraphData = {
-        nombre_valeur: d3.sum(
-          filteredMetaColonne,
-          (d) => d.nombre_valeur - d.nombre_valeur_manquante
-        ),
-        nombre_valeur_manquante: d3.sum(
-          filteredMetaColonne,
-          (d) => d.nombre_valeur_manquante
-        ),
-      };
+      // statistique valeurs manquantes et existantes
 
-      const anomaliesGraphData = {
-        nombre_valeur: d3.sum(filteredMetaColonne, (d) => d.nombre_valeur),
-        nombre_anomalie: d3.sum(filteredMetaColonne, (d) => d.nombre_anomalie),
-      };
-
-      const invalidValuesGraphData = {
-        nombre_anomalie_manquante: d3.sum(
+      const allMissingValues = [{
+        label: 'Valeurs existantes',
+        value: d3.sum(
           filteredMetaColonne,
-          (d) => d.nombre_anomalie - d.nombre_valeur_manquante
-        ),
-        nombre_valide: d3.sum(
+          (d) => d.nombre_valeurs - d.nombre_valeurs_manquantes
+      )},{
+        label: 'valeurs manquantes',
+        value: d3.sum(
           filteredMetaColonne,
-          (d) =>
-            d.nombre_valeur - (d.nombre_anomalie - d.nombre_valeur_manquante)
+          (d) => d.nombre_valeurs_manquantes
         ),
-      };
+      }];
 
-      createCircleGraph(circleGraphData);
-      createAnomaliesGraph(anomaliesGraphData);
-      createInvalidValuesGraph(invalidValuesGraphData);
+      setMissingValuesPieGraphData(allMissingValues);
+
+      // statistique valeurs conformes et anormale
+
+      const allAnomaliesValues = [{
+        label: 'valeurs conformes',
+        value: d3.sum(
+          filteredMetaColonne,
+          (d) => d.nombre_valeurs - count_anomalies(d.meta_anomalie)
+      )},{
+        label: "valeurs anormales",
+        value: d3.sum(
+          filteredMetaColonne,
+          (d) => count_anomalies(d.meta_anomalie)
+        ),
+      }];
+
+      setAnomaliesPieGraphData(allAnomaliesValues);
+
+      // statistique valeurs valides et invalides
+      const allInvalidValues = [{
+        label: 'Anomalie et valeurs manquantes',
+        value: d3.sum(
+          filteredMetaColonne,
+          (d) => count_anomalies(d.meta_anomalie) + d.nombre_valeurs_manquantes
+      )},{
+        label: "Valeurs valides",
+        value: d3.sum(
+          filteredMetaColonne,
+          (d) => d.nombre_valeurs - (count_anomalies(d.meta_anomalie) - d.nombre_valeurs_manquantes)
+        ),
+      }];
+
+      setInvalidPieGraphData(allInvalidValues);
     }
-  }, [selectedTableId]);
 
-  const createCircleGraph = (data) => {
-    d3.select('#circle-graph-container').select('svg').remove();
-
-    renderTitle(selectedTableInfo.title1);
+  }, [metaTableData, metaColonneData]);
 
 
-    const width = 200;
-    const height = 200;
-    const radius = Math.min(width, height) / 2;
-    const color = d3.scaleOrdinal(['#98abc5', '#8a89a6']);
 
-    const svg = d3
-      .select('#circle-graph-container')
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height)
-      .append('g')
-      .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
-
-    const pie = d3.pie().value((d) => d);
-
-    const dataForPieChart = [data.nombre_valeur - data.nombre_valeur_manquante, data.nombre_valeur_manquante];
-
-    const arc = d3.arc().innerRadius(0).outerRadius(radius);
-
-    svg
-      .selectAll('path')
-      .data(pie(dataForPieChart))
-      .enter()
-      .append('path')
-      .attr('d', arc)
-      .attr('fill', (d, i) => color(i));
-
-    svg
-      .selectAll('text')
-      .data(pie(dataForPieChart))
-      .enter()
-      .append('text')
-      .attr('transform', (d) => 'translate(' + arc.centroid(d) + ')')
-      .attr('dy', '.4em')
-      .style('text-anchor', 'middle')
-      .text((d) => d.data);
-    
-    
-  };
-
-  const createAnomaliesGraph = (data) => {
-    d3.select('#anomalies-graph-container').select('svg').remove();
-
-    renderTitle(selectedTableInfo.title2);
-
-
-    const width = 200;
-    const height = 200;
-    const radius = Math.min(width, height) / 2;
-    const color = d3.scaleOrdinal(['#1f77b4', '#ff7f0e']);
-
-    const svg = d3
-      .select('#anomalies-graph-container')
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height)
-      .append('g')
-      .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
-
-    const pie = d3.pie().value((d) => d);
-
-    const dataForPieChart = [data.nombre_valeur - data.nombre_anomalie, data.nombre_anomalie];
-
-    const arc = d3.arc().innerRadius(0).outerRadius(radius);
-
-    svg
-      .selectAll('path')
-      .data(pie(dataForPieChart))
-      .enter()
-      .append('path')
-      .attr('d', arc)
-      .attr('fill', (d, i) => color(i));
-
-    svg
-      .selectAll('text')
-      .data(pie(dataForPieChart))
-      .enter()
-      .append('text')
-      .attr('transform', (d) => 'translate(' + arc.centroid(d) + ')')
-      .attr('dy', '.4em')
-      .style('text-anchor', 'middle')
-      .text((d) => d.data);
-    
-  
-  };
-  const createInvalidValuesGraph = (data) => {
-    d3.select('#invalid-values-graph-container').select('svg').remove();
-
-    renderTitle(selectedTableInfo.title3);
-
-
-    const width = 200;
-    const height = 200;
-    const radius = Math.min(width, height) / 2;
-    const color = d3.scaleOrdinal(['#2ca02c', '#d62728']);
-
-    const svg = d3
-      .select('#invalid-values-graph-container')
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height)
-      .append('g')
-      .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
-
-    const pie = d3.pie().value((d) => d);
-
-    const dataForPieChart = [data.nombre_anomalie_manquante, data.nombre_valide];
-
-    const arc = d3.arc().innerRadius(0).outerRadius(radius);
-
-    svg
-      .selectAll('path')
-      .data(pie(dataForPieChart))
-      .enter()
-      .append('path')
-      .attr('d', arc)
-      .attr('fill', (d, i) => color(i));
-
-    svg
-      .selectAll('text')
-      .data(pie(dataForPieChart))
-      .enter()
-      .append('text')
-      .attr('transform', (d) => 'translate(' + arc.centroid(d) + ')')
-      .attr('dy', '.4em')
-      .style('text-anchor', 'middle')
-      .text((d) => d.data);
-    
-    
-  };
   const renderTitle = (title) => {
     return <Typography variant="h6">{title}</Typography>;
   };
@@ -880,7 +838,7 @@ const Page = () => {
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Container maxWidth="xl">
           <Grid container spacing={3}>
-          <Grid xs={12} md={12} lg={12}>
+          <Grid item xs={12} md={12} lg={12}>
               <MetaTable
                 columnsNames={[
                   'ID',
@@ -888,9 +846,10 @@ const Page = () => {
                   'Nombre colonnes',
                   'Nombre lignes',
                   'Date création',
-                  'Date diagnostic',
+                  // 'Date diagnostic',
                 ]}
-                data={metaTableData.slice(tableStartIndex, tableEndIndex)}
+                data={metaTableData}
+
               />
               <Pagination
                 count={Math.ceil(metaTableData.length / itemsPerPage)}
@@ -900,9 +859,10 @@ const Page = () => {
             </Grid>
             <Grid xs={12} md={12} lg={12}>
               <MetaColonne
-                columnsNames={['ID', 'ID Méta table', 'ID méta spécial car', 'Clé primaire table', 'Nom colonne', 'Type donnée', 'Date création', 'Date diagnostic', 'Nombre valeurs', 'Nombre de valeurs manquantes', 'Nombre outliers', 'Sémantique', 'Langue', 'Nombre anomalies', 'Nombre majuscules', 'Nombre Miniscules', 'Nombre initcap', 'Valeur minimale', 'Valeur maximale' ]}
-                
+                columnsNames={['ID', 'ID Méta table', 'Nom colonne', 'Type donnée', 'Date création', 'Date diagnostic', 'Nombre valeurs', 'Nombre de valeurs manquantes', 'Nombre outliers', 'Sémantique', 'Langue', 'Nombre anomalies', 'Nombre majuscules', 'Nombre Miniscules', 'Nombre initcap', 'Valeur minimale', 'Valeur maximale' ]}
                 data={metaColonneData.slice(colonneStartIndex, colonneEndIndex)}
+                nombre_lignes ={nombreValeurs}
+                count_anomalies={count_anomalies}
               />
               <Pagination
                 count={Math.ceil(metaColonneData.length / itemsPerPage)}
@@ -910,55 +870,69 @@ const Page = () => {
                 onChange={handleChangeColonnePage}
               />
             </Grid>
-            <Grid item xs={12} md={12} lg={12}>
-             <Typography variant="h6" gutterBottom>
-                    Statistique
-             </Typography>
-             <h10>Sélectionner une table  </h10>
-             <Select value={selectedTableId}  onChange={handleTableSelect}>
-                {metaTableData.map((table) => (
-                  <MenuItem key={table.id} value={table.id}>
-                    {table.nom_table}
-                  </MenuItem>
-                ))}
-             </Select>
+
+            {metaTableData.length > 0 && (
+              <Grid item xs={12} md={12} lg={12}>
+                <Card>
+
+                <CardHeader title={"Les statistiques de la table:" + metaTableData[0].nom_table} />
+                <CardContent>
+                <Grid container spacing={3}>
+              
+              {missingValuesPieGraphData.length > 0 && (
+                <Grid item xs={12} md={4} lg={4}>
+                  <PieGraph data={missingValuesPieGraphData} title="Valeurs manquantes VS Existantes" colors={['green', 'red']} width={300} height={300} />
+                </Grid>
+              )}
+
+              {anomaliesPieGraphData.length > 0 && (
+                <Grid item xs={12} md={4} lg={4}>
+                  <PieGraph data={anomaliesPieGraphData} title=" Valeurs conformes VS anomalies" width={300} height={300} />
+                </Grid>
+              )}
+
+              {invalidPieGraphData.length > 0 && (
+                <Grid item xs={12} md={4} lg={4}>
+                  <PieGraph data={invalidPieGraphData} title="Valeurs invalides VS valides " colors={['orange', 'gray']} width={300} height={300} />
+                </Grid>
+              )}
+
+                </Grid>
+                </CardContent>
+              
+            </Card>
+  
             
             </Grid>
-            <Grid item xs={12} md={4} lg={4}>
-              {selectedTableInfo && renderTitle(selectedTableInfo.title1)}
-              <Box id="circle-graph-container"></Box>
-            </Grid>
-            <Grid item xs={12} md={4} lg={4}>
-              {selectedTableInfo && renderTitle(selectedTableInfo.title2)} 
-              <Box id="anomalies-graph-container"></Box>
-            </Grid>
-            <Grid item xs={12} md={4} lg={4}>
-              {selectedTableInfo && renderTitle(selectedTableInfo.title3)} 
-              <Box id="invalid-values-graph-container"></Box>
-            </Grid>
-            <Grid item xs={12} md={12} lg={12}>
-              {selectedTableId && (
-                <>
-                  <Typography variant="h6" gutterBottom>
-                    Statistique par colonne
-                  </Typography>
-                  <h10>Sélectionner une colonne</h10>
+            )}
+            {metaTableData.length > 0 && (
+              <Grid item xs={12} md={12} lg={12}>
+                <Card>
+
+                  <CardHeader title="Les statistiques par colonne"/>
+                  <CardContent>
+                  <label>Sélectionner une colonne: </label>
                   <Select value={selectedColumnName} onChange={handleColumnSelect}>
                     {metaColonneData
-                      .filter((colonne) => colonne.id_meta_table === selectedTableId)
+                      .filter((colonne) => colonne.meta_table === metaTableData[0].id)
                       .map((colonne) => (
                         <MenuItem key={colonne.id_meta_colonne} value={colonne.nom_colonne}>
                           {colonne.nom_colonne}
                         </MenuItem>
                       ))}
                   </Select>
-                </>
-              )}
+
+                  <Grid item xs={12} md={12} lg={12}>
+                    <Box id="bar-graph-container"></Box>
+                  </Grid>
+                  </CardContent>
+                </Card>
+                  
             </Grid>
-            <Grid item xs={12} md={12} lg={12}>
-              <Box id="bar-graph-container"></Box>
-            </Grid>
+            )};
+    
           </Grid>
+         
         </Container>
       </Box>
     </>

@@ -1,5 +1,3 @@
-
-import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
 import {
   Box,
   Button,
@@ -21,10 +19,11 @@ import { Scrollbar } from 'src/components/scrollbar';
 import React,{ useState } from 'react';
 
 import { fullPageModalStyle, modalHeaderStyle} from "./style-popup";
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 
 
 export const MetaColonne = (props) => {
-  const {columnsNames = [],data = []} = props;
+  const {columnsNames = [],data = [], nombre_lignes = 0, count_anomalies} = props;
 
   const [open, setOpen] = useState(false);
 
@@ -35,6 +34,14 @@ export const MetaColonne = (props) => {
   const handleClose = () => {
     setOpen(false);
   };
+
+
+
+  const formatDateString = (originalDateString) => {
+    const formattedDate = new Date(originalDateString).toLocaleString();
+    return formattedDate;
+  };
+
 
 
   return (
@@ -56,43 +63,43 @@ export const MetaColonne = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.slice(0, 5).map((row) => {
+              {data.map((row) => {
                 // const createdAt = format(order.createdAt, 'dd/MM/yyyy');
 
                 return (
                   <TableRow
                     hover
-                    key={row.id_meta_colonne}
+                    key={row.id}
                   >
                     <TableCell>
-                        {row.id_meta_colonne}
+                        {row.id}
                     </TableCell>
                     <TableCell>
-                        {row.id_meta_table}
+                        {row.meta_table}
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                         {row.id_meta_special_car}
                     </TableCell>
                     <TableCell>
                         {row.id_table_origin}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                         {row.nom_colonne}
                     </TableCell>
                     <TableCell>
-                        {row.type_donnee}
+                        {row.type_donnees}
                     </TableCell>
                     <TableCell>
-                        {row.date_creation}
+                        {formatDateString(row.date_creation)}
                     </TableCell>
                     <TableCell>
                         {row.date_diagnostic}
                     </TableCell>
                     <TableCell>
-                        {row.nombre_valeur}
+                        {row.nombre_valeurs}
                     </TableCell>
                     <TableCell>
-                        {row.nombre_valeur_manquante}
+                        {row.nombre_valeurs_manquantes}
                     </TableCell>
                     <TableCell>
                         {row.nombre_outliers}
@@ -104,17 +111,17 @@ export const MetaColonne = (props) => {
                         {row.langue}
                     </TableCell> 
                     <TableCell>
-                        {row.nombre_anomalie}
+                        {count_anomalies(row.meta_anomalie)}
                     </TableCell>
           
                     <TableCell>
                         {row.nombre_majuscules}
                     </TableCell>
                     <TableCell>
-                        {row.nombre_miniscules}
+                        {row.nombre_minuscules}
                     </TableCell>
                     <TableCell>
-                        {row.nombre_initcap}
+                        {row.nombre_init_cap}
                     </TableCell>
                     <TableCell>
                         {row.col_min}
@@ -165,7 +172,7 @@ export const MetaColonne = (props) => {
                 <TableCell>{row.type_donnee}</TableCell>
                 <TableCell>{row.date_creation}</TableCell>
                 <TableCell>{row.date_diagnostic}</TableCell>
-                <TableCell>{row.nombre_valeur}</TableCell>
+                <TableCell>{nombre_lignes}</TableCell>
                 <TableCell>{row.nombre_valeur_manquante}</TableCell>
                 <TableCell>{row.nombre_outliers}</TableCell>
                 <TableCell>{row.semantique}</TableCell>
