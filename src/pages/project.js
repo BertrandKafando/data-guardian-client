@@ -99,6 +99,17 @@ const Page = () => {
     });
   };
 
+
+
+  const getDiagnosticDBofProject = (id_projet) => {
+    return getBdsByProjectId(id_projet).then((data) => {
+      data = data.results;
+      const db = data[0];
+      return db;
+
+    });
+  };
+
 const navAssessment =(id) =>{
   router.push({
     pathname : '/assessment',
@@ -106,9 +117,15 @@ const navAssessment =(id) =>{
   });
 };
 
-const navResult=() =>{
-  router.push('/metadata');
-}
+  const navResult = (projectId) => {
+    getDiagnosticDBofProject(projectId).then((db) => {
+      router.push({
+        pathname: '/metadata',
+        query: { bd_id: db.id }
+      });
+    });
+  }
+    
 
   function addProject() {
     setIsDialogOpen(true);
@@ -276,7 +293,7 @@ const navResult=() =>{
                         <Button type="submit" color="primary" onClick={() => handleEditProject(row)}>
                           <SvgIcon fontSize="small"><EditCircleIcon /></SvgIcon>
                         </Button>
-                        <Button type="submit" color="primary" onClick={navResult}>
+                        <Button type="submit" color="primary" onClick={() => navResult(row.id)}>
                           <SvgIcon fontSize="small"><AnalyticsIcon /></SvgIcon>
                         </Button>
 
