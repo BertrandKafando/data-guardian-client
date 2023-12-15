@@ -20,6 +20,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import TextField from '@mui/material/TextField';
 import { useRouter } from 'next/navigation';
 import { useAuth } from 'src/hooks/use-auth';
+import { getBdsByProjectId, getDiagnosticByBdID } from 'src/api/project';
 
 
 
@@ -33,8 +34,10 @@ const Page = () => {
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [deleteProjectId, setDeleteProjectId] = useState(null);
 
-   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editableProject, setEditableProject] = useState({ id: null, nom_projet: '', descriptif: '' });
+  const [buttonsToShow, setButtonsToShow] = useState([]);
+
 
 
 
@@ -49,12 +52,52 @@ const Page = () => {
 
   const getProjects =() => {
     getAllProjectsOfUser().then((response) => {
-
-      console.log(response);
       setProjets(response?.results);
+      
+
+
     }).catch((error) => {
       console.log("error", error);
     })
+  };
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const buttonsData = await Promise.all(
+        projets.map(async (row) => {
+          const result = await getDBofProject(row.id);
+          return result;
+        })
+      );
+      setButtonsToShow(buttonsData);
+    };
+
+    fetchData();
+  }, [projets]);
+
+  const getDBofProject = (id_projet) => {
+    const res = {
+      bd_button: false,
+      diagnostic_button: false,
+    };
+    return getBdsByProjectId(id_projet).then((data) => {
+      data = data.results;
+      console.log(data);
+      res.bd_button = data.length == 0 ? true : false;
+      if (res.bd_button) {
+        res.diagnostic_button = true;
+        return res;
+      }
+      else {
+        // vu que le projet peut avoir plusieurs bd par , on prendrons 1 d'abord
+       const db = data[0];
+        return getDiagnosticByBdID(db.id).then((data) => {
+          res.diagnostic_button = data.length == 0 ? false : true;
+          return res;
+        });
+      }
+    });
   };
 
 const navAssessment =(id) =>{
@@ -220,39 +263,33 @@ const navResult=() =>{
 
                 </TableRow>
               </TableHead>
-              <TableBody>
-              
-                {projets.map((row) => {
-                  //data.slice(0, 5).
-
-                  return (
+                <TableBody>
+                  {projets.map((row, index) => (
                     <TableRow
                       hover
                       key={row.id}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                     >
-              
-                      <TableCell>
-                        {row.nom_projet}
-                      </TableCell>
-                      <TableCell>
-                        {row.descriptif}
-                      </TableCell>
-                      <TableCell>
-                        {row.date_creation}
-                      </TableCell>
+                      <TableCell>{row.nom_projet}</TableCell>
+                      <TableCell>{row.descriptif}</TableCell>
+                      <TableCell>{row.date_creation}</TableCell>
                       <TableCell align='center'>
-                        <Button type="submit" color="primary" onClick={() => handleEditProject(row)}> <SvgIcon fontSize="small"><EditCircleIcon /></SvgIcon></Button>
-                        <Button type="submit" color="primary" onClick={navResult}> <SvgIcon fontSize="small"><AnalyticsIcon /></SvgIcon></Button>
-                        <Button type="submit" color="primary" onClick={() => navAssessment(row.id) }> <SvgIcon fontSize="small"><AddIcon /></SvgIcon></Button>
-                        <Button type="submit" color="primary" onClick={() => handleDeleteProject(row.id)}> <SvgIcon fontSize="small"><DeleteIcon /></SvgIcon></Button>
+                        <Button type="submit" color="primary" onClick={() => handleEditProject(row)}>
+                          <SvgIcon fontSize="small"><EditCircleIcon /></SvgIcon>
+                        </Button>
+                        <Button type="submit" color="primary" onClick={navResult}>
+                          <SvgIcon fontSize="small"><AnalyticsIcon /></SvgIcon>
+                        </Button>
 
+                        {buttonsToShow[index] && buttonsToShow[index].bd_button && (
+                          <Button type="submit" color="primary" onClick={() => navAssessment(row.id)}>
+                            <SvgIcon fontSize="small"><AddIcon /></SvgIcon>
+                          </Button>
+                        )}
                       </TableCell>
-                    
                     </TableRow>
-                  );
-                })}
-              </TableBody>
+                  ))}
+                </TableBody>
               </Table>
               </TableContainer>
           </Grid>
