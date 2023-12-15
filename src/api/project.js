@@ -61,3 +61,24 @@ export const editProject = async (projectId, updatedProjectData) => {
     throw error;
   }
 };
+
+
+export const getBdsByProjectId = async (projectId) => {
+  try {
+    const response = await productApi.get(`/base-de-donnees/?project_id=${projectId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error getting project with ID ${projectId}:`, error);
+    throw error;
+  }
+};
+
+export const getDiagnosticByBdID = async (bdId) => {
+  try {
+    const response = await productApi.get(`/diagnostic/?bd_id=${bdId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error getting diagnostic with ID ${bdId}:`, error);
+    throw error;
+  }
+}

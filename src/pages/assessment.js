@@ -9,6 +9,7 @@ import { DataCard } from "src/sections/assessment/data-card";
 import ReplyIcon from '@mui/icons-material/Reply';
 import { ModalChecklist } from "src/sections/assessment/modal-checklist";
 import { useRouter } from "next/router";
+import { getBdsByProjectId } from 'src/api/project';
 
 const Page = (props) => {
 
@@ -22,10 +23,9 @@ const Page = (props) => {
   const [fileToSend, setFileToSend] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [errorFileIsEmpty, setErrorFileIsEmpty] = useState(false);
-  const [delimeter, setDelimeter] = useState("Point virgule");
+  const [delimeter, setDelimeter] = useState("Virgule");
   const [header, setHeader] = useState(false); 
   const [text, setText] = useState("");
-  const [extension, setExtension] = useState("");
 
 
 
@@ -35,39 +35,46 @@ const Page = (props) => {
     const file = event.target.files[0];
     // get extension of file
 
-    setExtension(file.name.split('.').pop());
+    let extension = file.name.split('.').slice(-1)[0];
     if (file == null || file == undefined || !file["name"]) {
       console.log("file is null");
       return;
     }
-    setErrorFileIsEmpty(false);
     setFileToSend(file);
+    setErrorFileIsEmpty(false);
     const reader = new FileReader();
     reader.onloadend = () => {
       const text = reader.result;
       setText(text);
       // processCSV(text);
-      parseAllFile();
+      parseAllFile(extension,text);
     };
 
     reader.readAsText(file);
   };
 
+  const parseJsonFile = () => {
+
+  }
+
+  const parseExelFile = () => {
+}
 
 
-  const parseAllFile = () => {
-    if (extension == "csv" || extension == "txt") {
-      parseFile(text, delimeters[delimeter], header);
+
+  const parseAllFile = (extension,txt) => {
+    if (extension.toUpperCase() === "CSV" || extension == "TXT") {
+      parseFile(txt, delimeters[delimeter], header);
     }
-    else if (extension == "xlsx" || extension == "xls") {
+    else if (extension.toUpperCase() == "XLSX" || extension == "XLS") {
+     // parseExelFile()
       setCsvArray([]);
     }
-    else if (extension == "json") {
+    else if (extension.toUpperCase() == "JSON") {
       setCsvArray([]);
     }
     else {
-      setCsvArray([]);
-      setErrorFileIsEmpty(true);
+      parseFile(txt, delimeters[delimeter], header);
     }
   }
 
@@ -76,20 +83,20 @@ const Page = (props) => {
 
 
   const handleDelimeter = (event) => {
-    if (fileToSend == null) {
+   /* if (fileToSend == null) {
       setErrorFileIsEmpty(true);
       return;
-    }
+    }*/
     setDelimeter(event.target.value);
     console.log(event.target.value);
     parseFile(text, delimeters[event.target.value], header);
   };
 
   const handleHeader = (event) => {
-    if (fileToSend == null) {
+   /* if (fileToSend == null) {
       setErrorFileIsEmpty(true);
       return;
-    }
+    }*/
     setHeader(event.target.checked);
     parseFile(text, delimeters[delimeter], event.target.checked);
   };
