@@ -9,9 +9,15 @@ export const productApi = axios.create({
 
 export const getAllProjectsOfUser = async () => {
   try {
-
-   
-    const response = await productApi.get("/projet/");
+  const token = window.localStorage.getItem('token');
+   const config = {
+    headers : {
+      'Authorization': 'Token '+token
+    }
+   }
+ 
+   console.log(config);
+    const response = await productApi.get("/projet/", config);
     return response.data;
   } catch (error) {
     console.error("Error getting all projects of user:", error);

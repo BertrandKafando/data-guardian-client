@@ -56,7 +56,7 @@ export const MetaTable = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.slice(0,5).map((row) => {
+              {data.map((row) => {
                 // const createdAt = format(order.createdAt, 'dd/MM/yyyy');
 
                 return (
@@ -71,17 +71,17 @@ export const MetaTable = (props) => {
                         {row.nom_table}
                     </TableCell>
                     <TableCell>
-                        {row.nombre_colonne}
+                        {row.nombre_colonnes}
                     </TableCell>
                     <TableCell>
-                        {row.nombre_ligne}
+                        {row.nombre_lignes}
                     </TableCell>
                     <TableCell>
                         {row.date_creation}
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                         {row.date_diagnostic}
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 );
               })}
