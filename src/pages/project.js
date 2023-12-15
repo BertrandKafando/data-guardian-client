@@ -83,7 +83,6 @@ const Page = () => {
     };
     return getBdsByProjectId(id_projet).then((data) => {
       data = data.results;
-      console.log(data);
       res.bd_button = data.length == 0 ? true : false;
       if (res.bd_button) {
         res.diagnostic_button = true;

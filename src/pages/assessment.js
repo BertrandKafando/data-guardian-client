@@ -23,7 +23,7 @@ const Page = (props) => {
   const [fileToSend, setFileToSend] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [errorFileIsEmpty, setErrorFileIsEmpty] = useState(false);
-  const [delimeter, setDelimeter] = useState("Point virgule");
+  const [delimeter, setDelimeter] = useState("Virgule");
   const [header, setHeader] = useState(false); 
   const [text, setText] = useState("");
 
