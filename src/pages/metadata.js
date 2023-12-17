@@ -583,24 +583,29 @@ const Page = () => {
        const barGraphData = [
       {
         label: 'Anomalies',
-        value: count_anomalies(selectedMetaColonne.meta_anomalie),
+        value: selectedMetaColonne.nombre_anomalies,
       },
       {
-        label: 'Valeurs Manquantes',
+        label: 'Valeurs manquantes',
         value: selectedMetaColonne.nombre_valeurs_manquantes,
+      },
+      {
+        label: 'Valeurs abérantes',
+        value: Math.abs(selectedMetaColonne.nombre_outliers),
+      },
+     
+      {
+        label: 'Valeurs invalides',
+        value:
+          selectedMetaColonne.nombre_anomalies -
+          selectedMetaColonne.nombre_valeurs_manquantes,
       },
       {
         label: 'Valeurs Valides',
         value:
           selectedMetaColonne.nombre_valeurs -
-          (count_anomalies(selectedMetaColonne.meta_anomalie) -
-            selectedMetaColonne.nombre_valeurs_manquantes),
-      },
-      {
-        label: 'Valeurs invalides',
-        value:
-        count_anomalies(selectedMetaColonne.meta_anomalie) -
-          selectedMetaColonne.nombre_valeurs_manquantes,
+          selectedMetaColonne.nombre_anomalies -
+            selectedMetaColonne.nombre_valeurs_manquantes,
       },
     ];
 
@@ -686,11 +691,6 @@ const Page = () => {
           metaColonne.nom_colonne === selectedColumnName
       );
   
-      // Vérifier si selectedMetaColonne est défini
-      if (selectedMetaColonne) {
-       
-
-      }
     }
   }, []);
 
@@ -794,12 +794,12 @@ const Page = () => {
         label: 'valeurs conformes',
         value: d3.sum(
           filteredMetaColonne,
-          (d) => d.nombre_valeurs - count_anomalies(d.meta_anomalie)
+          (d) => d.nombre_valeurs - d.nombre_anomalies
       )},{
         label: "valeurs anormales",
         value: d3.sum(
           filteredMetaColonne,
-          (d) => count_anomalies(d.meta_anomalie)
+          (d) => d.nombre_anomalies
         ),
       }];
 
@@ -807,15 +807,15 @@ const Page = () => {
 
       // statistique valeurs valides et invalides
       const allInvalidValues = [{
-        label: 'Anomalie et valeurs manquantes',
+        label: 'Valeurs invalides',
         value: d3.sum(
           filteredMetaColonne,
-          (d) => count_anomalies(d.meta_anomalie) + d.nombre_valeurs_manquantes
+          (d) => d.nombre_anomalies + d.nombre_valeurs_manquantes + d.nombre_outliers
       )},{
         label: "Valeurs valides",
         value: d3.sum(
           filteredMetaColonne,
-          (d) => d.nombre_valeurs - (count_anomalies(d.meta_anomalie) - d.nombre_valeurs_manquantes)
+          (d) => d.nombre_valeurs - (d.nombre_anomalies - d.nombre_valeurs_manquantes - d.nombre_outliers)
         ),
       }];
 
@@ -859,7 +859,7 @@ const Page = () => {
             </Grid>
             <Grid xs={12} md={12} lg={12}>
               <MetaColonne
-                columnsNames={['ID', 'ID Méta table', 'Nom colonne', 'Type donnée', 'Date création', 'Date diagnostic', 'Nombre valeurs', 'Nombre de valeurs manquantes', 'Nombre outliers', 'Sémantique', 'Langue', 'Nombre anomalies', 'Nombre majuscules', 'Nombre Miniscules', 'Nombre initcap', 'Valeur minimale', 'Valeur maximale' ]}
+                columnsNames={['ID', 'ID Méta table', 'Nom colonne', 'Type donnée', 'Date création', 'Date diagnostic', 'Nombre valeurs', 'Nombre de valeurs manquantes', 'Nombre outliers', 'Nombre anomalies', 'Nombre majuscules', 'Nombre Miniscules', 'Nombre initcap', 'Valeur minimale', 'Valeur maximale' ]}
                 data={metaColonneData.slice(colonneStartIndex, colonneEndIndex)}
                 nombre_lignes ={nombreValeurs}
                 count_anomalies={count_anomalies}
@@ -890,6 +890,8 @@ const Page = () => {
                   <PieGraph data={anomaliesPieGraphData} title=" Valeurs conformes VS anomalies" width={300} height={300} />
                 </Grid>
               )}
+
+              
 
               {invalidPieGraphData.length > 0 && (
                 <Grid item xs={12} md={4} lg={4}>
