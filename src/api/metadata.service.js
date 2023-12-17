@@ -20,6 +20,7 @@ export const getMetaTable = async (bd_id) => {
 export const getMetaColonne = async (meta_table_id) => {
   try {
     const response = await Api.get("meta-colonne/?meta_table_id=" + meta_table_id);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error getting all metacolonne of metatable:", error);

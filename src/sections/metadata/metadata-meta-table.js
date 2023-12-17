@@ -37,6 +37,11 @@ export const MetaTable = (props) => {
     setOpen(false);
   };
 
+  const formatDateString = (originalDateString) => {
+    const formattedDate = new Date(originalDateString).toLocaleString();
+    return formattedDate;
+  };
+
 
   return (
     <>
@@ -77,7 +82,7 @@ export const MetaTable = (props) => {
                         {row.nombre_lignes}
                     </TableCell>
                     <TableCell>
-                        {row.date_creation}
+                        {formatDateString(row.date_creation)}
                     </TableCell>
                     {/* <TableCell>
                         {row.date_diagnostic}

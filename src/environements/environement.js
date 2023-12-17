@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   hmr: false,
-  apiUrl: 'https://real-signs-look.loca.lt/api/'
+  apiUrl: 'http://127.0.0.1:8000/api/'
 };
 
 

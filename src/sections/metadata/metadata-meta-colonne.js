@@ -4,6 +4,9 @@ import {
   Card,
   CardActions,
   CardHeader,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Divider,
   Modal,
   SvgIcon,
@@ -27,6 +30,10 @@ export const MetaColonne = (props) => {
 
   const [open, setOpen] = useState(false);
 
+  const [openAnomalie, setOpenAnomalie] = useState(false);
+  const [columnAnomalies, setColumnAnomalies] = useState([]);
+  const [columnNameSelected, setColumnNameSelected] = useState("");
+
   const handleOpen = () => {
     setOpen(true);
   };
@@ -34,6 +41,16 @@ export const MetaColonne = (props) => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleAnomalies = (col_name, meta_anomalie) => {
+    setOpenAnomalie(true);
+    setColumnAnomalies(meta_anomalie);
+    setColumnNameSelected(col_name);
+  }
+
+  const handleCloseAnomalie = ()=>{
+    setOpenAnomalie(false);
+  }
 
 
 
@@ -93,7 +110,7 @@ export const MetaColonne = (props) => {
                         {formatDateString(row.date_creation)}
                     </TableCell>
                     <TableCell>
-                        {row.date_diagnostic}
+                        {formatDateString(row.date_diagnostic)}
                     </TableCell>
                     <TableCell>
                         {row.nombre_valeurs}
@@ -104,14 +121,10 @@ export const MetaColonne = (props) => {
                     <TableCell>
                         {row.nombre_outliers}
                     </TableCell>
+      
                     <TableCell>
-                        {row.semantique}
-                    </TableCell>
-                    <TableCell>
-                        {row.langue}
-                    </TableCell> 
-                    <TableCell>
-                        {count_anomalies(row.meta_anomalie)}
+                        {row.nombre_anomalies}
+                        <Button onClick={()=> handleAnomalies(row.nom_colonne, row.meta_anomalie)}><RemoveRedEyeIcon /></Button>
                     </TableCell>
           
                     <TableCell>
@@ -141,56 +154,32 @@ export const MetaColonne = (props) => {
       <CardActions sx={{ justifyContent: 'space-between' }}>
       </CardActions>
     </Card>
-    
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box sx={fullPageModalStyle}>
-      <Box sx={modalHeaderStyle}>
-          <Typography variant="h6">Méta colonne</Typography>
-        </Box>
-      <TableContainer sx={{ flex: 1, overflow: 'auto', bgcolor: 'white', padding: 5, paddingTop: 0, zIndex: 999  }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {columnsNames.map((colName, index) => (
-                <TableCell size="string" key={index} sx={{ position: 'sticky', top: 0, bgcolor: 'white', zIndex: 999 }}>{colName}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((row) => (
-              <TableRow hover key={row.id_meta_colonne}>
-                <TableCell>{row.id_meta_colonne}</TableCell>
-                <TableCell>{row.id_meta_table}</TableCell>
-                <TableCell>{row.id_meta_special_car}</TableCell>
-                <TableCell>{row.id_table_origin}</TableCell>
-                <TableCell>{row.nom_colonne}</TableCell>
-                <TableCell>{row.type_donnee}</TableCell>
-                <TableCell>{row.date_creation}</TableCell>
-                <TableCell>{row.date_diagnostic}</TableCell>
-                <TableCell>{nombre_lignes}</TableCell>
-                <TableCell>{row.nombre_valeur_manquante}</TableCell>
-                <TableCell>{row.nombre_outliers}</TableCell>
-                <TableCell>{row.semantique}</TableCell>
-                <TableCell>{row.langue}</TableCell>
-                <TableCell>{row.nombre_anomalie}</TableCell>
-                <TableCell>{row.nombre_majuscules}</TableCell>
-                <TableCell>{row.nombre_miniscules}</TableCell>
-                <TableCell>{row.nombre_initcap}</TableCell>
-                <TableCell>{row.col_min}</TableCell>
-                <TableCell>{row.col_max}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      </Box>
-    </Modal>
 
+    <Dialog open={openAnomalie} onClose={handleCloseAnomalie}>
+        <DialogContent>
+          <Typography>Anomalies de la colonne: {columnNameSelected}</Typography>
+        <Table>
+            <TableHead>
+              <TableRow>
+              <TableCell size='string'> Nom de l'anomalie</TableCell>
+              <TableCell size='string'> Valeurs trouvés</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+            {columnAnomalies
+                .filter(anomalie => anomalie.valeur_trouvee !== null)
+                .map((anomalie, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{anomalie.nom_anomalie}</TableCell>
+                    <TableCell>{anomalie.valeur_trouvee}</TableCell>
+                  </TableRow>
+                ))}
+
+
+            </TableBody>
+          </Table>
+        </DialogContent>
+    </Dialog>
     </>
   );
 };
