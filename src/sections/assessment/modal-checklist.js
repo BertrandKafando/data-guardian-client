@@ -2,13 +2,20 @@ import { Box, Button, Checkbox, FormControlLabel, Modal, Typography,CircularProg
 import { useState } from "react";
 import { sendFileAndLaunchDiagnostic } from "src/api/services";
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
+import InfoIcon from '@mui/icons-material/Info';
+import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
+import { useRouter } from "next/router";
 
  
  export const ModalChecklist = (props) => {
 
-    const {setOpenModal, openModal, fileToSend} = props;
+   const { setOpenModal, openModal, fileToSend, id_projet, delimeter, header } = props;
     const [loading, setLoading] = useState(false);
     const [messageError, setMessageError] = useState(null);
+    const [finishDiagnostic, setFinishDiagnostic] = useState(false);
+
+    const [diagnostic, setDiagnostic] = useState(null);
+
     const [checkboxValues, setCheckboxValues] = useState({
         VAL_MANQ: false,
         VAL_MANQ_CONTRAINTS: false,
@@ -16,6 +23,10 @@ import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
         VAL_MANQ_CONTRAINTS_FN_DUPLICATIONS: false,
         ALL: false,
       });
+
+    const router = useRouter();
+
+
     const fullPageModalStyle = {
         position: 'fixed',
         top: '30%',
@@ -41,6 +52,17 @@ import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
       const handleCloseModal = () => {
         setOpenModal(false);
         setMessageError(null);
+
+        setCheckboxValues({
+          VAL_MANQ: false,
+          VAL_MANQ_CONTRAINTS: false,
+          VAL_MANQ_CONTRAINTS_FN: false,
+          VAL_MANQ_CONTRAINTS_FN_DUPLICATIONS: false,
+          ALL: false,
+        })
+
+        setFinishDiagnostic(false);
+
       };
 
       const handleCheckboxChange = (name) => {
@@ -54,17 +76,7 @@ import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
         setCheckboxValues(newCheckboxValues);
       };
     
-      // encode file to base64
-      const encodeFileToBase64 = (file, callback) => {
-        const reader = new FileReader();
-      
-        reader.onload = () => {
-          const base64Data = reader.result.split(',')[1];
-          callback(base64Data, file.name);
-        };
-      
-        reader.readAsDataURL(file);
-      };
+
     
       const handleDiagnostic = (e) => {
         e.preventDefault();
@@ -75,9 +87,12 @@ import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
         console.log(selectedOption[0]);
     
         if (selectedOption.length == 1){
-          encodeFileToBase64(fileToSend, (base64Data)=> {
-                
-            sendFileAndLaunchDiagnostic(base64Data, fileToSend, "CSV", selectedOption[0]).then((response)=> {
+
+        
+            sendFileAndLaunchDiagnostic(fileToSend,selectedOption[0], id_projet,delimeter,header).then((response)=> {
+
+                setFinishDiagnostic(true);
+                setDiagnostic(response.diagnostic);
                 console.log(response);
 
                 setLoading(false);
@@ -87,13 +102,28 @@ import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
                 setLoading(false);
 
             })
-            })
         }else{
           setMessageError("Aucun option n'a été choisi");
           setLoading(false);
         }       
        
       };
+
+      // view diagnostic
+      const navResult=() =>{
+
+        if(diagnostic != null){
+          router.push({
+            pathname: '/metadata',
+            query: {
+              bd_id : diagnostic.base_de_donnees.id
+            }
+          });
+
+        }
+      }
+      
+    
 
     return (
     <Modal
@@ -106,81 +136,101 @@ import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
             {messageError && (
               <Alert severity="error" onClose={() => {setMessageError(null)}} variant="filled" sx={{ maxWidth: '400px' }}>{messageError}</Alert>
             )}
-        <Box sx={modalHeaderStyle}>
-            <TroubleshootIcon style={{ fontSize: '3rem' }}/>
 
-            <Typography variant="h6">Check list</Typography>
-          </Box>
+          {!finishDiagnostic ? (
+            <>
+             <Box sx={modalHeaderStyle}>
+                <TroubleshootIcon style={{ fontSize: '3rem' }}/>
 
-          <Box>
-          <form onSubmit={handleDiagnostic}>
-          <FormControlLabel
-            control={
-              <Checkbox
-              color="success"
-              inputProps={{ 'aria-label': 'success checkbox' }}
-                checked={checkboxValues.VAL_MANQ}
-                onChange={() => handleCheckboxChange('VAL_MANQ')}
-              />
-            }
-            label="1- Valeurs manquantes"
-            style={{width: '100%'}}
-          />
+                <Typography variant="h6">Check list</Typography>
+              </Box>
 
-          <FormControlLabel
-              control={
-                <Checkbox
-                  color="success"
-                  inputProps={{ 'aria-label': 'success checkbox' }}
-                  checked={checkboxValues.VAL_MANQ_CONTRAINTS}
-                  onChange={() => handleCheckboxChange('VAL_MANQ_CONTRAINTS')}
+              <Box>
+                <form onSubmit={handleDiagnostic}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                    color="success"
+                    inputProps={{ 'aria-label': 'success checkbox' }}
+                      checked={checkboxValues.VAL_MANQ}
+                      onChange={() => handleCheckboxChange('VAL_MANQ')}
+                    />
+                  }
+                  label="1- Valeurs manquantes"
+                  style={{width: '100%'}}
                 />
-              }
-              label="2- Valeurs manquantes + contraintes"
-              style={{width: '100%'}}
-            />
-          <FormControlLabel
-              control={
-                <Checkbox
-                  color="success"
-                  inputProps={{ 'aria-label': 'success checkbox' }}
-                  checked={checkboxValues.VAL_MANQ_CONTRAINTS_FN}
-                  onChange={() => handleCheckboxChange('VAL_MANQ_CONTRAINTS_FN')}
-                />
-              }
-              label="3- Valeurs manquantes + contraintes + Formes normales"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  color="success"
-                  inputProps={{ 'aria-label': 'success checkbox' }}
-                />
-              }
-              label="4- Valeurs manquantes + contraintes + Formes normales + Duplications"
-              style={{width: '100%'}}
-              checked={checkboxValues.VAL_MANQ_CONTRAINTS_FN_DUPLICATIONS}
-              onChange={() => handleCheckboxChange('VAL_MANQ_CONTRAINTS_FN_DUPLICATIONS')}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  color="success"
-                  inputProps={{ 'aria-label': 'success checkbox' }}
-                />
-              }
-              label="5- Tous"
-              style={{width: '100%'}}
-              checked={checkboxValues.ALL}
-              onChange={() => handleCheckboxChange('ALL')}
-            />
-            <Button disabled={loading} type="submit" variant="contained" color="primary" style={{ marginTop: '20px' }}>
 
-            {loading ? <CircularProgress size={24} color="inherit" /> : ' Lancer le diagnostic'}
-           
-          </Button>
-        </form>
-          </Box>
+                <FormControlLabel
+                    control={
+                      <Checkbox
+                        color="success"
+                        inputProps={{ 'aria-label': 'success checkbox' }}
+                        checked={checkboxValues.VAL_MANQ_CONTRAINTS}
+                        onChange={() => handleCheckboxChange('VAL_MANQ_CONTRAINTS')}
+                      />
+                    }
+                    label="2- Valeurs manquantes + contraintes"
+                    style={{width: '100%'}}
+                  />
+                <FormControlLabel
+                    control={
+                      <Checkbox
+                        color="success"
+                        inputProps={{ 'aria-label': 'success checkbox' }}
+                        checked={checkboxValues.VAL_MANQ_CONTRAINTS_FN}
+                        onChange={() => handleCheckboxChange('VAL_MANQ_CONTRAINTS_FN')}
+                      />
+                    }
+                    label="3- Valeurs manquantes + contraintes + Formes normales"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        color="success"
+                        inputProps={{ 'aria-label': 'success checkbox' }}
+                      />
+                    }
+                    label="4- Valeurs manquantes + contraintes + Formes normales + Duplications"
+                    style={{width: '100%'}}
+                    checked={checkboxValues.VAL_MANQ_CONTRAINTS_FN_DUPLICATIONS}
+                    onChange={() => handleCheckboxChange('VAL_MANQ_CONTRAINTS_FN_DUPLICATIONS')}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        color="success"
+                        inputProps={{ 'aria-label': 'success checkbox' }}
+                      />
+                    }
+                    label="5- Tous"
+                    style={{width: '100%'}}
+                    checked={checkboxValues.ALL}
+                    onChange={() => handleCheckboxChange('ALL')}
+                  />
+                  <Button disabled={loading} type="submit" variant="contained" color="primary" style={{ marginTop: '20px' }}>
+
+                  {loading ? <CircularProgress size={24} color="inherit" /> : ' Lancer le diagnostic'}
+                
+                </Button>
+                </form>
+              </Box>
+            </>
+
+          ) : (
+           <>
+               <Box sx={modalHeaderStyle}>
+                <InfoIcon style={{ fontSize: '2.5rem' }}/>
+
+                <Typography variant="h6">Diagnostic terminé</Typography>
+              </Box>
+              <Box sx={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
+              <DoneOutlineIcon style={{ fontSize: '5rem', color:'green' }}/>
+              <p style={{color: '#514949', fontSize:'13px'}}>Diagnostic reussi. Cliquez pour voir les résultats</p>
+              <Button variant="contained" sx={{marginTop: '10px'}} onClick={navResult}>Voir les résultats</Button>
+              </Box>
+           </>
+          )}
+         
         </Box>
       
     </Modal>

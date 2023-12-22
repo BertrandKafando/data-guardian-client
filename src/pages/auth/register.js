@@ -58,7 +58,6 @@ const Page = () => {
     onSubmit: async (values, helpers) => {
       try {
 
-        console.log(values);
         await auth.signUp(values);
         router.push('/');
       } catch (err) {
@@ -122,7 +121,6 @@ const Page = () => {
               onSubmit={formik.handleSubmit}
             >
                {formik.errors.submit && (
-
                   <Alert severity="error" variant="filled" sx={{ maxWidth: '100%', marginBottom: '10px' }}>{formik.errors.submit}</Alert>
                   )}
               <Stack spacing={3}>

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import { signInRequest, signUpRequest } from "src/api/auth.service";
+import { signInRequest, signUpRequest, signOutRequest } from "src/api/auth.service";
 
 
 const HANDLERS = {
@@ -84,12 +84,8 @@ export const AuthProvider = (props) => {
     }
 
     if (isAuthenticated) {
-      const user = {
-        id: '5e86809283e28b96d2d38537',
-        avatar: '/assets/avatars/avatar-anika-visser.png',
-        name: 'my name',
-        email: 'anika.visser@devias.io'
-      };
+      const user = JSON.parse(window.localStorage.getItem('user'));
+
 
       dispatch({
         type: HANDLERS.INITIALIZE,
@@ -110,25 +106,7 @@ export const AuthProvider = (props) => {
     []
   );
 
-  const skip = () => {
-    try {
-      window.localStorage.setItem('authenticated', 'true');
-    } catch (err) {
-      console.error(err);
-    }
-
-    const user = {
-      id: '5e86809283e28b96d2d38537',
-      avatar: '/assets/avatars/avatar-anika-visser.png',
-      email: 'anika.visser@devias.io'
-    };
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user
-    });
-  };
-
+  
   const signIn = async (email, password) => {
 
     let user = null;
@@ -139,14 +117,18 @@ export const AuthProvider = (props) => {
         window.localStorage.setItem('token', response?.token);
         window.localStorage.setItem('authenticated', 'true');
         
+
+
         user = {
           id: response?.user.id,
-          avatar: '/assets/avatars/avatar-anika-visser.png',
-          email: response?.user.identifiant,
-          name: response?.user.prenom + " " + response?.user.nom
+          identifiant: response?.user.identifiant,
+          avatar: '/assets/avatars/avatar.png',
+          name: response?.user.prenom + " " + response?.user.nom,
+          organisation: response?.user.organisation,
+          
         }
 
-
+        window.localStorage.setItem('user', JSON.stringify(user));
 
       })
     } catch (error) {
@@ -178,7 +160,18 @@ export const AuthProvider = (props) => {
     });
   };
 
-  const signOut = () => {
+  const signOut = async() => {
+   
+    await signOutRequest().then(response=>{
+      console.log(response);
+      window.localStorage.removeItem('token');
+      window.localStorage.removeItem('authenticated');
+      window.localStorage.removeItem('user');
+    }).catch(err => {
+      console.log(err);
+    })
+
+
     dispatch({
       type: HANDLERS.SIGN_OUT
     });
@@ -188,7 +181,6 @@ export const AuthProvider = (props) => {
     <AuthContext.Provider
       value={{
         ...state,
-        skip,
         signIn,
         signUp,
         signOut

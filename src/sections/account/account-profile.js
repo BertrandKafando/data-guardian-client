@@ -9,16 +9,11 @@ import {
   Typography
 } from '@mui/material';
 
-const user = {
-  avatar: '/assets/avatars/avatar-anika-visser.png',
-  city: 'Los Angeles',
-  country: 'USA',
-  jobTitle: 'Senior Developer',
-  name: 'Anika Visser',
-  timezone: 'GTM-7'
-};
 
-export const AccountProfile = () => (
+export const AccountProfile = (props) => {
+  const {userInfo} = props;
+
+  return (
   <Card>
     <CardContent>
       <Box
@@ -29,7 +24,7 @@ export const AccountProfile = () => (
         }}
       >
         <Avatar
-          src={user.avatar}
+          src='/assets/avatars/avatar.png'
           sx={{
             height: 80,
             mb: 2,
@@ -40,30 +35,23 @@ export const AccountProfile = () => (
           gutterBottom
           variant="h5"
         >
-          {user.name}
+          {userInfo.prenom} {userInfo.nom}
         </Typography>
         <Typography
           color="text.secondary"
           variant="body2"
         >
-          {user.city} {user.country}
+          @{userInfo.compte.identifiant}
         </Typography>
         <Typography
           color="text.secondary"
           variant="body2"
         >
-          {user.timezone}
+          Role: {userInfo.role.nom_role}
         </Typography>
       </Box>
     </CardContent>
     <Divider />
-    <CardActions>
-      <Button
-        fullWidth
-        variant="text"
-      >
-        Upload picture
-      </Button>
-    </CardActions>
+   
   </Card>
-);
+)};

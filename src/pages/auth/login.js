@@ -25,8 +25,8 @@ const Page = () => {
   const [method, setMethod] = useState('email');
   const formik = useFormik({
     initialValues: {
-      identifiant: 'amadou',
-      password: '123456',
+      identifiant: '',
+      password: '',
       submit: null
     },
     validationSchema: Yup.object({
@@ -52,6 +52,7 @@ const Page = () => {
     }
   });
 
+
   const handleMethodChange = useCallback(
     (event, value) => {
       setMethod(value);
@@ -59,13 +60,6 @@ const Page = () => {
     []
   );
 
-  const handleSkip = useCallback(
-    () => {
-      auth.skip();
-      router.push('/');
-    },
-    [auth, router]
-  );
 
   return (
     <>
@@ -159,23 +153,6 @@ const Page = () => {
                 >
                  Se connecter
                 </Button>
-                <Button
-                  fullWidth
-                  size="large"
-                  sx={{ mt: 3 }}
-                  onClick={handleSkip}
-                >
-                  Skip authentication
-                </Button>
-                <Alert
-                  color="primary"
-                  severity="info"
-                  sx={{ mt: 3 }}
-                >
-                  <div>
-                    You can use <b>amadou</b> and password <b>123456</b>
-                  </div>
-                </Alert>
               </form>
     
           </div>

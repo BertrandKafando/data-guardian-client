@@ -67,4 +67,52 @@ export const signUpRequest = async (user) => {
       
     }
   };
+
+  export const signOutRequest = async () =>{
+
+
+    const token = window.localStorage.getItem('token');
+    
+    const config = {
+      headers: {
+        'Content-Type': 'application/json', // Specify JSON content type
+        'Authorization': 'Token ' + token
+      },
+    };
   
+    try {
+      const response = await Api.post('/logout/',{}, config);
+  
+      return response.data;
+    } catch (error) {
+
+      throw error;
+    }
+  }
+  
+
+  export const getUserInfo = async (userID) => {
+  
+    try {
+      const response = await Api.get('/utilisateur/'+userID);
+      return response.data;
+    } catch (error) {
+        throw error;      
+    }
+  };
+
+  export const updateUserInfo = async (userInfo) => {
+  
+    try {
+
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+      const response = await Api.put('/utilisateur/'+userInfo.id + '/', userInfo, config);
+      return response.data;
+    } catch (error) {
+        throw error;      
+    }
+  };

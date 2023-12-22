@@ -38,11 +38,11 @@ const Page = () => {
             >
               <img
                 alt="Under development"
-                src="/assets/errors/error-404.png"
+                src="/assets/logos/logodg.png"
                 style={{
                   display: 'inline-block',
                   maxWidth: '100%',
-                  width: 400
+                  width: 900
                 }}
               />
             </Box>
@@ -51,14 +51,24 @@ const Page = () => {
               sx={{ mb: 3 }}
               variant="h3"
             >
-              Welcome to Data Guardian Pro
+              Bienvenue sur Data Guardian Pro
             </Typography>
             <Typography
               align="center"
               color="text.secondary"
               variant="body1"
+              sx={{
+                position: 'relative',
+                animation: 'bounceText 5s linear infinite', // Animation de 5 secondes en boucle
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                '@keyframes bounceText': {
+                  '0%, 100%': { left: '0' }, // Début et fin de l'animation (position initiale)
+                  '50%': { left: 'calc(100% - 100vw)' }, // Point médian de l'animation (position maximale à droite)
+                },
+              }}
             >
-              Des données clients irréprochables pour des processus parfaits.
+              Des Données  irréprochables pour des processus parfaits.
             </Typography>
 
           </Box>

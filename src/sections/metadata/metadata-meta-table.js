@@ -37,6 +37,11 @@ export const MetaTable = (props) => {
     setOpen(false);
   };
 
+  const formatDateString = (originalDateString) => {
+    const formattedDate = new Date(originalDateString).toLocaleString();
+    return formattedDate;
+  };
+
 
   return (
     <>
@@ -56,7 +61,7 @@ export const MetaTable = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.slice(0,5).map((row) => {
+              {data.map((row) => {
                 // const createdAt = format(order.createdAt, 'dd/MM/yyyy');
 
                 return (
@@ -71,17 +76,17 @@ export const MetaTable = (props) => {
                         {row.nom_table}
                     </TableCell>
                     <TableCell>
-                        {row.nombre_colonne}
+                        {row.nombre_colonnes}
                     </TableCell>
                     <TableCell>
-                        {row.nombre_ligne}
+                        {row.nombre_lignes}
                     </TableCell>
                     <TableCell>
-                        {row.date_creation}
+                        {formatDateString(row.date_creation)}
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                         {row.date_diagnostic}
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 );
               })}
@@ -91,21 +96,6 @@ export const MetaTable = (props) => {
       </Scrollbar>
       <Divider />
       <CardActions sx={{ justifyContent: 'space-between' }}>
-        <Typography>{data.length} lignes au total</Typography>
-        <Button
-            color="inherit"
-            endIcon={(
-            <SvgIcon fontSize="small">
-                <ArrowRightIcon />
-            </SvgIcon>
-            )}
-            size="small"
-            variant="text"
-
-            onClick={handleOpen}
-        >
-            Voir tous
-        </Button>
     </CardActions>
     </Card>
     <Modal
@@ -160,15 +150,6 @@ export const MetaTable = (props) => {
           </TableBody>
         </Table>
       </TableContainer>
-        <Box sx={modalHeaderStyle}>
-            <Typography>{data.length} lignes au total</Typography>
-            <Button
-                color="inherit"
-                onClick={handleClose}
-            >
-            Fermer
-          </Button>
-        </Box>
       </Box>
       
      

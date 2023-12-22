@@ -1,7 +1,7 @@
 import axios from "axios";
 import { environment } from "src/environements/environement";
 
-export const productApi = axios.create({
+export const Api = axios.create({
   baseURL: environment.apiUrl,
 });
 
@@ -9,7 +9,7 @@ export const productApi = axios.create({
 export const sendCSV = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
-  return await productApi.post("/data/upload", formData, {
+  return await Api.post("/data/upload", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -17,35 +17,98 @@ export const sendCSV = async (file) => {
 };
 
 
-export const sendFileAndLaunchDiagnostic = async (base64File, file, fileExtension, option) => {
+export const sendFileAndLaunchDiagnostic = async (file, option, id_projet,delimeter,header) => {
   try {
-    const formData = new FormData();
-    // formData.append("base64File", base64File);
-    // formData.append("fileExtension", fileExtension);
-    formData.append("parametre_diagnostic", option);
 
+    const requestData = {
+      parametre_diagnostic: option,
+      base_de_donnees: {
+        nom_base_de_donnees: "define_inbackend",
+        type_fichier: "CSV", // look in fichier bd
+        nom_fichier: "look in fichier bd",
+        format_fichier: "Tabulaire",
+        separateur: delimeter,
+        avec_entete: header,
+        fichier_bd: file,
+        projet: id_projet
+      }
+    }
 
-    formData.append("nom_base_de_donnees", "bdd")
-    formData.append("type_fichier", fileExtension)
-    formData.append("nom_fichier", "nom_fichier.csv")
-    formData.append("separateur", "Virgule")
-    formData.append("format_fichier", "Tabulaire")
-    formData.append("nom_base_de_donnees", "bdd_test")
-    
-    formData.append("taille_fichier", "1250")
-    formData.append("fichier_bd", file)
-    
-    formData.append("avec_entete", true)
+    const token = window.localStorage.getItem('token');
 
-    const response = await productApi.post("/base-de-donnees/", formData, {
+    const config = {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
+        'Authorization': 'Token ' + token
       },
-    });
-    console.log(response.data);
+    };
+
+    console.log(config);
+
+    const response = await Api.post('/diagnostic/', requestData, config);
+
     return response.data;
+
+  
+  
   } catch (error) {
     console.error("Error sending file and launching diagnostic:", error);
     throw error;
   }
+};
+
+// get meta all contraintes
+export const get_meta_all_constraintes = async () => {
+  try {   
+    const response = await Api.get("/meta-tous-contraintes/");
+    return response.data;
+  } catch (error) {
+    console.error('erreur produite lors de la récupération des méta contraintes: ' + error);
+    throw error;
+  }
+  
+};
+
+export const add_new_constrainte = async (newContrainte) => {
+  try {
+
+    const config = {
+      headers : {
+        'Content-Type': 'application/json',
+      }
+    }
+    const response = await Api.post("/meta-tous-contraintes/", newContrainte, config);
+    return response.data;
+  } catch (error) {
+    console.error('erreur produite lors de l ajout de la constainte: ' + error);
+  }
+  
+};
+
+export const edit_constrainte = async (containte) => {
+  try {
+
+    const config = {
+      headers : {
+        'Content-Type': 'application/json',
+      }
+    }
+    const response = await Api.put("/meta-tous-contraintes/"+containte.id + "/", containte, config);
+    return response.data;
+  } catch (error) {
+    console.error('erreur produite lors de la modification de la containte: ' + error);
+  }
+  
+};
+
+
+export const remove_constrainte = async (containte) => {
+  try {
+
+    const response = await Api.delete("/meta-tous-contraintes/"+containte.id + "/");
+    return response.data;
+  } catch (error) {
+    console.error('erreur produite lors de la suppression de la containte: ' + error);
+  }
+  
 };
