@@ -61,6 +61,12 @@ const Page = () => {
     })
   };
 
+  const formatDateString = (originalDateString) => {
+    const formattedDate = new Date(originalDateString).toLocaleString();
+    return formattedDate;
+  };
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -228,10 +234,10 @@ const navAssessment =(id) =>{
       <Box
         component="main"
         sx={{
-          alignItems: 'center',
           display: 'flex',
           flexGrow: 1,
-          minHeight: '100%'
+          minHeight: '100%',
+          marginTop: '20px'
         }}
       >
         <Container maxWidth="xl">
@@ -288,7 +294,7 @@ const navAssessment =(id) =>{
                     >
                       <TableCell>{row.nom_projet}</TableCell>
                       <TableCell>{row.descriptif}</TableCell>
-                      <TableCell>{row.date_creation}</TableCell>
+                      <TableCell>{formatDateString(row.date_creation)}</TableCell>
                       <TableCell align='center'>
                         <Button type="submit" color="primary" onClick={() => handleEditProject(row)}>
                           <SvgIcon fontSize="small"><EditCircleIcon /></SvgIcon>
