@@ -23,6 +23,7 @@ import React,{ useState } from 'react';
 
 import { fullPageModalStyle, modalHeaderStyle} from "./style-popup";
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import { display } from '@mui/system';
 
 
 export const MetaColonne = (props) => {
@@ -122,7 +123,7 @@ export const MetaColonne = (props) => {
                         {row.nombre_outliers}
                     </TableCell>
       
-                    <TableCell>
+                    <TableCell sx={{display: 'flex', alignItems:'center', justifyContent: 'space-between'}}>
                         {row.nombre_anomalies}
                         <Button onClick={()=> handleAnomalies(row.nom_colonne, row.meta_anomalie)}><RemoveRedEyeIcon /></Button>
                     </TableCell>

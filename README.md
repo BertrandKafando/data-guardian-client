@@ -1,4 +1,5 @@
 ## Data Guardian Pro
+1. Install NodeJS
 
 1. Install the dependencies:
 
