@@ -32,6 +32,7 @@
     "formik": "2.2.9",
     "next": "^13.5.6",
     "nprogress": "0.2.0",
+    "pandas-js": "^0.2.4",
     "papaparse": "^5.4.1",
     "prop-types": "15.8.1",
     "react": "18.2.0",
