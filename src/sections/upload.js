@@ -21,7 +21,7 @@ const Upload = ({ handleFileUpload }) => {
       <input
         type="file"
         id="fileInput"
-        accept=".csv"
+        accept=".csv, .txt,.xlsx,.xls,.json"
         onChange={(e) => handleFileUpload(e)}
         style={{ display: 'none' }}
       />
