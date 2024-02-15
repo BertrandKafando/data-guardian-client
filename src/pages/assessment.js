@@ -26,6 +26,7 @@ const Page = (props) => {
   const [delimeter, setDelimeter] = useState("Virgule");
   const [header, setHeader] = useState(false); 
   const [text, setText] = useState("");
+  const [extension, setExtension] = useState("");
 
 
 
@@ -36,6 +37,7 @@ const Page = (props) => {
     // get extension of file
 
     let extension = file.name.split('.').slice(-1)[0];
+    setExtension(extension);
     if (file == null || file == undefined || !file["name"]) {
       console.log("file is null");
       return;
@@ -45,6 +47,7 @@ const Page = (props) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const text = reader.result;
+      console.log("text : " + text)
       setText(text);
       // processCSV(text);
       parseAllFile(extension,text);
@@ -53,9 +56,42 @@ const Page = (props) => {
     reader.readAsText(file);
   };
 
-  const parseJsonFile = () => {
+  const parseJsonFile = (txt) => {
+    try {
+      // Parsing du JSON
+      const parsedData = JSON.parse(txt);
+  
+      // Extraire les valeurs (objets)
+      const values = Object.values(parsedData);
+  
+      // Extraire les clés (proprietes des objets)
+      const keys = Object.keys(values[0]); // Supposant que toutes les entrées ont la même structure
+  
+      // Créer un tableau avec les clés en première ligne
+      const dataArray = [keys];
+  
+      // Ajouter les valeurs des objets dans les lignes suivantes
+      values.forEach((obj) => {
+        const row = keys.map((key) => obj[key]);
+        dataArray.push(row);
+      });
 
-  }
+      // Vérifier que dataArray ne contient que des types de données primitifs
+    const isDataArrayValid = Array.isArray(dataArray) && dataArray.every((row) => Array.isArray(row) && row.every((value) => typeof value !== 'object' && !React.isValidElement(value)));
+
+    if (isDataArrayValid) {
+      setCsvArray(dataArray);
+    } else {
+      console.error('Erreur : dataArray contient des objets React.');
+       return;
+    }
+    } catch (error) {
+      setErrorFileIsEmpty(true);
+      console.error('Erreur lors de l\'analyse du fichier JSON :', error);
+      return;
+    }
+  };
+  
 
   const parseExelFile = () => {
 }
@@ -71,7 +107,7 @@ const Page = (props) => {
       setCsvArray([]);
     }
     else if (extension.toUpperCase() == "JSON") {
-      setCsvArray([]);
+      parseJsonFile(txt);
     }
     else {
       parseFile(txt, delimeters[delimeter], header);
@@ -83,20 +119,27 @@ const Page = (props) => {
 
 
   const handleDelimeter = (event) => {
-   /* if (fileToSend == null) {
+    if (fileToSend == null) {
       setErrorFileIsEmpty(true);
       return;
-    }*/
+    }
+    // verifier si le fichier est de type json
+    if (extension.toUpperCase() == "JSON") {
+      return;
+    }
     setDelimeter(event.target.value);
     console.log(event.target.value);
     parseFile(text, delimeters[event.target.value], header);
   };
 
   const handleHeader = (event) => {
-   /* if (fileToSend == null) {
+    if (fileToSend == null) {
       setErrorFileIsEmpty(true);
       return;
-    }*/
+    }
+    if (extension.toUpperCase() == "JSON") {
+      return;
+    }
     setHeader(event.target.checked);
     parseFile(text, delimeters[delimeter], event.target.checked);
   };

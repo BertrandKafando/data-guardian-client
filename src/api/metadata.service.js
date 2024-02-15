@@ -28,6 +28,16 @@ export const getMetaColonne = async (meta_table_id) => {
   }
 }
 
+export const getDiagnosticScore = async (bd_id) =>{
+  try {
+    const response = await Api.get("score-diagnostic/?bd_id=" + bd_id);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting diagnostic score", error);
+    throw error;
+  }
+}
+
 
 
 //http://127.0.0.1:8000/api/meta-table/?bd_id=1

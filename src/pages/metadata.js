@@ -1,6 +1,6 @@
 import React, { useState , useEffect } from 'react';
 import Head from 'next/head';
-import { Box, Container, Grid, Select, MenuItem , Typography, Card, CardHeader, CardContent} from '@mui/material';
+import { Box, Container, Grid, Select, MenuItem , Typography, Card, CardHeader, CardContent, CircularProgress} from '@mui/material';
 import Pagination from '@mui/material/Pagination';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { MetaTable } from 'src/sections/metadata/metadata-meta-table';
@@ -8,10 +8,11 @@ import { MetaColonne } from 'src/sections/metadata/metadata-meta-colonne';
 import { select } from 'd3';
 import * as d3 from 'd3';
 import Chart from 'chart.js/auto';
-import { getMetaColonne, getMetaTable } from 'src/api/metadata.service';
+import { getDiagnosticScore, getMetaColonne, getMetaTable } from 'src/api/metadata.service';
 import { useRouter } from 'next/router';
 import PieGraph from 'src/sections/metadata/pie-graph';
 import { height, width } from '@mui/system';
+import { Score, ScoreDiagnostic } from 'src/components/score_diagnostic';
 
 const Page = () => {
   const itemsPerPage = 5;
@@ -574,6 +575,9 @@ const Page = () => {
   const [anomaliesPieGraphData, setAnomaliesPieGraphData] = useState([]);
   const [invalidPieGraphData, setInvalidPieGraphData] = useState([]);
 
+
+  const [scoreDiagnostic, setScoreDiagnostic] = useState(0)
+
   const getColumnStatistic = (metaColsData, columnName) => {
     const columnNameData = metaColsData.filter(col => col.nom_colonne == columnName);
 
@@ -825,6 +829,22 @@ const Page = () => {
   }, [metaTableData, metaColonneData]);
 
 
+  // get score
+
+  const getScore = async (bd_id) => {
+    await getDiagnosticScore(bd_id).then((response)=>{
+      setScoreDiagnostic(response?.results[0].valeur);
+    }).catch(error=>{
+      console.log(error);
+    })
+  }
+
+  useEffect(()=> {
+      getScore(bd_id);
+
+  }, [])
+
+
 
   const renderTitle = (title) => {
     return <Typography variant="h6">{title}</Typography>;
@@ -838,7 +858,7 @@ const Page = () => {
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Container maxWidth="xl">
           <Grid container spacing={3}>
-          <Grid item xs={12} md={12} lg={12}>
+          <Grid item xs={12} md={9} lg={9}>
               <MetaTable
                 columnsNames={[
                   'ID',
@@ -856,7 +876,11 @@ const Page = () => {
                 page={currentTablePage}
                 onChange={handleChangeTablePage}
               />
-            </Grid>
+          </Grid>
+
+          <Grid item xs={12} md={3} lg={3}>
+            <ScoreDiagnostic value={scoreDiagnostic} />
+          </Grid>
             <Grid xs={12} md={12} lg={12}>
               <MetaColonne
                 columnsNames={['ID', 'ID Méta table', 'Nom colonne', 'Type donnée', 'Date création', 'Date diagnostic', 'Nombre valeurs', 'Nombre de valeurs manquantes', 'Nombre outliers', 'Nombre anomalies', 'Nombre majuscules', 'Nombre Miniscules', 'Nombre initcap', 'Valeur minimale', 'Valeur maximale' ]}
@@ -880,13 +904,13 @@ const Page = () => {
                 <Grid container spacing={3}>
               
               {missingValuesPieGraphData.length > 0 && (
-                <Grid item xs={12} md={4} lg={4}>
+                <Grid item xs={12} md={3} lg={3}>
                   <PieGraph data={missingValuesPieGraphData} title="Valeurs manquantes VS Existantes" colors={['green', 'red']} width={300} height={300} />
                 </Grid>
               )}
 
               {anomaliesPieGraphData.length > 0 && (
-                <Grid item xs={12} md={4} lg={4}>
+                <Grid item xs={12} md={3} lg={3}>
                   <PieGraph data={anomaliesPieGraphData} title=" Valeurs conformes VS anomalies" width={300} height={300} />
                 </Grid>
               )}
@@ -894,10 +918,12 @@ const Page = () => {
               
 
               {invalidPieGraphData.length > 0 && (
-                <Grid item xs={12} md={4} lg={4}>
+                <Grid item xs={12} md={3} lg={3}>
                   <PieGraph data={invalidPieGraphData} title="Valeurs invalides VS valides " colors={['orange', 'gray']} width={300} height={300} />
                 </Grid>
               )}
+
+             
 
                 </Grid>
                 </CardContent>
@@ -931,7 +957,12 @@ const Page = () => {
                 </Card>
                   
             </Grid>
-            )};
+            )}
+
+
+
+
+        
     
           </Grid>
          
