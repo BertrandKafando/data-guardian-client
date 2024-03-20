@@ -3,7 +3,10 @@ import { Box, Table, SvgIcon,TableBody, TableCell, TableHead, TableRow, Paper, T
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 const DuplicatesComponent = ({ anomaliesData }) => {
   // Filtrer pour obtenir uniquement les anomalies DOUBLONS_SIMILAIRES
-  const duplicateAnomalies = anomaliesData.filter(anomalie => anomalie.anomalie === 'DOUBLONS_SIMILAIRES');
+  const duplicateAnomalies = anomaliesData.filter(anomalie => {
+    const normalizedAnomalie = anomalie.anomalie.toUpperCase().replace(/\s+/g, '_');
+    return normalizedAnomalie === 'DOUBLONS_DETECTE' || normalizedAnomalie === 'DOUBLONS';
+});
 
     const [corrections, setCorrections] = useState({});
     const applyCorrections = () => {

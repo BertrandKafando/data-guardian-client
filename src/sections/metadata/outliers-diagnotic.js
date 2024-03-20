@@ -7,7 +7,7 @@ const OutliersComponent = ({ anomaliesData }) => {
 
   const groupOutliersByColumn = (data) => {
     const grouped = {};
-    data.filter(anomalie => anomalie.anomalie === 'OUTLIER').forEach(anomalie => {
+    data.filter(anomalie => anomalie.anomalie === 'DETECTION_VALEUR_ABERANTE').forEach(anomalie => {
       const key = anomalie.nom_colonne;
       if (!grouped[key]) {
         grouped[key] = [];
