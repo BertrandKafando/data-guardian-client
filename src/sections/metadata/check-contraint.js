@@ -9,20 +9,24 @@ const CheckConstraintsComponent = ({ anomaliesData }) => {
     setSelected({ ...selected, [id]: !selected[id] });
   };
     // Filtrer pour obtenir uniquement les anomalies concernées
-    const filteredAnomalies = anomaliesData.filter(anomalie =>
-        anomalie.anomalie === 'ESPACES_SUPPERFLUS' ||
-        anomalie.anomalie === 'REPETITIONS_DE_LETTRES' ||
-        anomalie.anomalie === 'CARACTERES_SPECIAUX'    ||
-        anomalie.anomalie === 'GROUPE_SANGUIN_INCONNU' ||
-        anomalie.anomalie === 'CONTINENT_INCONNU_OU_MAL_ECRIT' ||
-        anomalie.anomalie === 'VILLE_INCONNU_OU_MAL_ECRIT' ||
-        anomalie.anomalie === 'PAYS_INCONNU_OU_MAL_ECRIT' ||
-        anomalie.anomalie === 'FORMAT_ADRESSE_INCORRECTE' ||
-        anomalie.anomalie === 'FORMAT_NUMERO_TELEPHONE_INCORRECTE' ||
-        anomalie.anomalie === 'EMAIL_INCORRECTE' || 
-        anomalie.anomalie === 'FORMAT_DATE_INCORRECTE' || 
-        anomalie.anomalie === 'VALEUR_NUMERIQUE_INCORRECTE'
-      );
+    const filteredAnomalies = anomaliesData.filter(anomalie => {
+        const normalizedAnomalie = anomalie.anomalie.toUpperCase().replace(/\s+/g, '_');
+        console.log(anomalie.anomalie, normalizedAnomalie)
+        return normalizedAnomalie === 'ESPACES_SUPPERFLUS' ||
+               normalizedAnomalie === 'REPETITIONS_DE_TROIS_LETTRES_CONSECUTIVES' || 
+               normalizedAnomalie === 'CARACTERES_SPECIAUX' || 
+               normalizedAnomalie === 'GROUPE_SANGUIN_INCONNU' ||
+               normalizedAnomalie === 'CONTINENT_INCONNU_OU_MAL_ECRIT' ||
+               normalizedAnomalie === 'VILLE_INCONNU_OU_MAL_ECRIT' ||
+               normalizedAnomalie === 'PAYS_INCONNU_OU_MAL_ECRIT' ||
+               normalizedAnomalie === 'FORMAT_ADRESSE_INCORRECTE' ||
+               normalizedAnomalie === 'FORMAT_NUMERO_TELEPHONE_INCORRECTE' ||
+               normalizedAnomalie === 'EMAIL_INCORRECTE' ||
+               normalizedAnomalie === 'FORMAT_DATE_INCORRECTE' ||
+               normalizedAnomalie === 'VALEUR_NUMERIQUE_INCORRECTE' ||
+                normalizedAnomalie === 'CIVILITE_INCONNU' ;
+    });
+    
   const groupAnomaliesByType = (data) => {
     const grouped = {};
     data.forEach(item => {
