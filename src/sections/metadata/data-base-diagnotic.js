@@ -15,7 +15,6 @@ const ClientsTable = ({ clients, diagnostics }) => {
   };
 
   if (!Array.isArray(clients) || clients.length === 0) {
-    console.log("clients2", clients);
     return null;
   }
 

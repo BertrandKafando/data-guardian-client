@@ -50,7 +50,7 @@ export const getAnalyseDatabase = async(bd_id) => {
 
 export const getDiagnosticDetails = async (bd_id) => {
   try {
-    const response = await Api.get("diagnostic-details/?bd_id=" + bd_id);
+    const response = await Api.get("diagnostic-detail/?bd_id=" + bd_id);
     return response.data;
   } catch (error) {
     console.error("Error getting diagnostic details", error);

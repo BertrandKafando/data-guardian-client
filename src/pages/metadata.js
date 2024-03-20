@@ -335,7 +335,7 @@ const Page = () => {
 
   const getDiagnosticData = async (bd_id) => {
     await getDiagnosticDetails(bd_id).then((data)=>{
-      setDiagnoticData(data);
+      setDiagnoticData(data.results);
     }).catch((error)=>{
       console.log(error);
     })
@@ -345,6 +345,7 @@ const Page = () => {
 
     getMetaTableData(bd_id);
     getAnalyseData(bd_id);
+    getDiagnosticData(bd_id);
 
 
     if (selectedTableId !== null && selectedColumnName !== null) {
@@ -620,7 +621,7 @@ const Page = () => {
 
                <DataCorrectionTabs yourData={diagnotic_data} />
 
-              <ClientsTable clients={database} diagnostics={yourData} />
+              <ClientsTable clients={database} diagnostics={diagnotic_data} />
       
         
             </Grid>

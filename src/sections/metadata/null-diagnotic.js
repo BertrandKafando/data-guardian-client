@@ -6,7 +6,6 @@ const AnomaliesComponent = ({ anomaliesData }) => {
   const [corrections, setCorrections] = useState({});
 
   const valeurNullAnomalies = anomaliesData.filter(anomalie => anomalie.anomalie === 'VALEUR_NULL');
-
   const groupAnomaliesByColumn = (data) => {
     const grouped = {};
     data.forEach(item => {
