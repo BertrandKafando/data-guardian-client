@@ -31,166 +31,6 @@ const Page = () => {
 
 
 
-  const yourData = [
-    {
-      id: 1,
-      id_ligne: 3,
-      nom_colonne: 'Column_5',
-      valeur: null,
-      anomalie: 'VALEUR_NULL',
-      type_colonne: 'character varying',
-      commentaire: 'La valeur est NULL',
-      code_correction: 'VALEUR_NULL',
-      diagnostic_id: 18
-    },
-    {
-      id: 2,
-      id_ligne: 4,
-      nom_colonne: 'Column_5',
-      valeur: null,
-      anomalie: 'VALEUR_NULL',
-      type_colonne: 'character varying',
-      commentaire: 'La valeur est NULL',
-      code_correction: 'VALEUR_NULL',
-      diagnostic_id: 18
-    },
-    {
-      id: 3,
-      id_ligne: 5,
-      nom_colonne: 'Column_6',
-      valeur: 'Incorrect',
-      anomalie: 'FORMAT_INCORRECT',
-      type_colonne: 'integer',
-      commentaire: 'Le format de la valeur est incorrect',
-      code_correction: 'CORRECT_FORMAT',
-      diagnostic_id: 19
-    },
-    {
-      id: 213,
-      id_ligne: 8,
-      nom_colonne: 'Column_2',
-      valeur: null, // Remarque : les valeurs 'nan' ont été converties en 'null'
-      anomalie: 'VALEUR_NULL',
-      type_colonne: 'character varying',
-      commentaire: 'La valeur est NULL',
-      code_correction: 'VALEUR_NULL',
-      diagnostic_id: 18
-    },
-    {
-      id: 214,
-      id_ligne: 9,
-      nom_colonne: 'Column_5',
-      valeur: null,
-      anomalie: 'VALEUR_NULL',
-      type_colonne: 'character varying',
-      commentaire: 'La valeur est NULL',
-      code_correction: 'VALEUR_NULL',
-      diagnostic_id: 18
-    },
-    {
-      id: 215,
-      id_ligne: 10,
-      nom_colonne: 'Column_4',
-      valeur: null,
-      anomalie: 'VALEUR_NULL',
-      type_colonne: 'character varying',
-      commentaire: 'La valeur est NULL',
-      code_correction: 'VALEUR_NULL',
-      diagnostic_id: 18
-    },
-    {
-      id: 216,
-      id_ligne: 11,
-      nom_colonne: 'Column_5',
-      valeur: null,
-      anomalie: 'VALEUR_NULL',
-      type_colonne: 'character varying',
-      commentaire: 'La valeur est NULL',
-      code_correction: 'VALEUR_NULL',
-      diagnostic_id: 18
-    },
-    {
-      id: 217,
-      id_ligne: 2,
-      nom_colonne: 'Column_4',
-      valeur: 1000,
-      anomalie: 'OUTLIER',
-      type_colonne: 'integer',
-      commentaire: 'La valeur est un outlier',
-      code_correction: 'VALEUR_OUTLIER',
-      diagnostic_id: 18
-    },
-    {
-      id: 218,
-      id_ligne: 13,
-      nom_colonne: 'Column_5',
-      valeur: "e",
-      anomalie: 'REPETITIONS_DE_LETTRES',
-      type_colonne: 'character varying',
-      commentaire: 'La valeur est NULL',
-      code_correction: 'VALEUR_NULL',
-      diagnostic_id: 18
-    },
-    {
-      id: 218,
-      id_ligne: 4,
-      nom_colonne: 'Column_7',
-      valeur: "",
-      anomalie: 'ESPACES_SUPPERFLUS',
-      type_colonne: 'character varying',
-      commentaire: 'La valeur contient des espaces superflus',
-      code_correction: 'VALEUR_ESPACES_SUPPERFLUS',
-      diagnostic_id: 18
-    },
-    {
-      id: 219,
-      id_ligne: 11,
-      nom_colonne: 'Column_5',
-      valeur: 'l5 et l6',
-      anomalie: 'DOUBLONS_SIMILAIRES',
-      type_colonne: 'character varying',
-      commentaire: 'ligne 5 et lign 6',
-      code_correction: 'VALEUR_DOUBLONS_SIMILAIRES',
-      diagnostic_id: 18
-    },
-    {
-      id: 220,
-      id_ligne: 6,
-      nom_colonne: 'Column_7',
-      valeur: null,
-      anomalie: 'VALEUR_NULL',
-      type_colonne: 'character varying',
-      commentaire: 'La valeur est NULL',
-      code_correction: 'VALEUR_NULL',
-      diagnostic_id: 18
-    },
-    {
-      id: 221,
-      id_ligne: 14,
-      nom_colonne: 'Column_7',
-      valeur: null,
-      anomalie: 'CONTINENT_INCONNU_OU_MAL_ECRIT',
-      type_colonne: 'character varying',
-      commentaire: 'La valeur est NULL',
-      code_correction: 'VALEUR_NULL',
-      diagnostic_id: 18
-    },
-    {
-      id: 222,
-      id_ligne: 1,
-      nom_colonne: 'Column_9',
-      valeur: null,
-      anomalie: 'VALEUR_NULL',
-      type_colonne: 'character varying',
-      commentaire: 'La valeur est NULL',
-      code_correction: 'VALEUR_NULL',
-      diagnostic_id: 18
-    },
-    
-  ];
-  
-
-
   const router = useRouter();
   const { bd_id } = router.query; 
 
@@ -335,7 +175,7 @@ const Page = () => {
 
   const getDiagnosticData = async (bd_id) => {
     await getDiagnosticDetails(bd_id).then((data)=>{
-      setDiagnoticData(data.results);
+      setDiagnoticData(data);
     }).catch((error)=>{
       console.log(error);
     })
@@ -525,6 +365,7 @@ const Page = () => {
                   'Nom table',
                   'Nombre colonnes',
                   'Nombre lignes',
+                  'Nombre de doublons',
                   'Date création',
                   // 'Date diagnostic',
                 ]}
@@ -543,7 +384,7 @@ const Page = () => {
           </Grid>
             <Grid xs={12} md={12} lg={12}>
               <MetaColonne
-                columnsNames={['ID', 'ID Méta table', 'Nom colonne', 'Type donnée', 'Date création', 'Date diagnostic', 'Nombre valeurs', 'Nombre de valeurs manquantes', 'Nombre outliers', 'Nombre anomalies', 'Nombre majuscules', 'Nombre Miniscules', 'Nombre initcap', 'Valeur minimale', 'Valeur maximale' ]}
+                columnsNames={['ID', 'ID Méta table', 'Nom colonne', 'Type donnée','Nombre de valeurs manquantes', 'Nombre outliers', 'Nombre anomalies', 'Nombre majuscules', 'Nombre Miniscules', 'Nombre initcap', 'Valeur minimale', 'Valeur maximale' ]}
                 data={metaColonneData.slice(colonneStartIndex, colonneEndIndex)}
                 nombre_lignes ={nombreValeurs}
                 count_anomalies={count_anomalies}
@@ -619,7 +460,7 @@ const Page = () => {
             </Grid>
             )}
 
-               <DataCorrectionTabs yourData={diagnotic_data} />
+               <DataCorrectionTabs yourData={diagnotic_data}  bd_id={bd_id} />
 
               <ClientsTable clients={database} diagnostics={diagnotic_data} />
       

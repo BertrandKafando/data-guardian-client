@@ -29,16 +29,7 @@ const AnomaliesComponent = ({ anomaliesData }) => {
 
   return (
     <>
-      <Box mb={2} sx={{ textAlign: 'right' }}>
-        <Button 
-          startIcon={<SvgIcon fontSize="small"><AnalyticsIcon /></SvgIcon>}
-          variant="contained"
-          color="success"
-          onClick={() => console.log(corrections)}
-        >
-          Appliquer les corrections
-        </Button>
-      </Box>
+     
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
         {Object.entries(groupedAnomalies).map(([column, items]) => (
           <Box key={column} sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 2, minWidth: 240 }}>

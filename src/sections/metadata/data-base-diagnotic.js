@@ -31,7 +31,7 @@ const ClientsTable = ({ clients, diagnostics }) => {
   };
   const getCellStyle2 = (client, columnName) => {
     const isOutlier = diagnostics.some(diag => {
-      return diag.id_ligne == client[idKey] && diag.nom_colonne.toUpperCase() == columnName.toUpperCase()  && diag.anomalie.toUpperCase() == 'OUTLIER';
+      return diag.id_ligne == client[idKey] && diag.nom_colonne.toUpperCase() == columnName.toUpperCase()  && diag.anomalie.toUpperCase() == 'DETECTION_VALEUR_ABERANTE';
     });
     if (isOutlier) {
       return { backgroundColor: '#d35400', color: 'white' }; 
@@ -40,7 +40,7 @@ const ClientsTable = ({ clients, diagnostics }) => {
   };
 
   const getRowStyle = (idLigne) => {
-    const hasDuplicate = diagnostics.some(diag => diag.id_ligne === idLigne && diag.anomalie === 'DOUBLONS_SIMILAIRES');
+    const hasDuplicate = diagnostics.some(diag => diag.id_ligne === idLigne && diag.anomalie === 'DOUBLONS');
     return hasDuplicate ? { backgroundColor: '#0097e6', color: 'white' } : {};
   };
   return (

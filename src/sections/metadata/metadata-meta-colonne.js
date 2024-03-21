@@ -108,15 +108,6 @@ export const MetaColonne = (props) => {
                         {row.type_donnees}
                     </TableCell>
                     <TableCell>
-                        {formatDateString(row.date_creation)}
-                    </TableCell>
-                    <TableCell>
-                        {formatDateString(row.date_diagnostic)}
-                    </TableCell>
-                    <TableCell>
-                        {row.nombre_valeurs}
-                    </TableCell>
-                    <TableCell>
                         {row.nombre_valeurs_manquantes}
                     </TableCell>
                     <TableCell>

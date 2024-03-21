@@ -10,8 +10,7 @@ const CheckConstraintsComponent = ({ anomaliesData }) => {
   };
     // Filtrer pour obtenir uniquement les anomalies concernées
     const filteredAnomalies = anomaliesData.filter(anomalie => {
-        const normalizedAnomalie = anomalie.anomalie.toUpperCase().replace(/\s+/g, '_');
-        console.log(anomalie.anomalie, normalizedAnomalie)
+        const normalizedAnomalie = anomalie.anomalie.toUpperCase();
         return normalizedAnomalie === 'ESPACES_SUPPERFLUS' ||
                normalizedAnomalie === 'REPETITIONS_DE_TROIS_LETTRES_CONSECUTIVES' || 
                normalizedAnomalie === 'CARACTERES_SPECIAUX' || 
@@ -82,16 +81,6 @@ const CheckConstraintsComponent = ({ anomaliesData }) => {
           </TableContainer>
         </Grid>
       ))}
-      <Box mt={2} textAlign="center">
-        <Button 
-          startIcon={<AnalyticsIcon />}
-          variant="contained"
-          color='success'
-          onClick={() => console.log("Selected corrections:", selected)}
-        >
-          Appliquer les corrections
-        </Button>
-      </Box>
     </Container>
   );
 };

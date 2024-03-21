@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
-import { Grid, Card, CardHeader, CardContent, Tabs, Tab, Box } from "@mui/material";
+import { Grid, Card, CardHeader, CardContent, Tabs, Tab, Box, Button, SvgIcon } from "@mui/material";
 import AnomaliesComponent from 'src/sections/metadata/null-diagnotic';
 import OutliersComponent from 'src/sections/metadata/outliers-diagnotic';
 import DuplicatesComponent from 'src/sections/metadata/doublons-sim-diagnotic';
 import CheckConstraintsComponent from 'src/sections/metadata/check-contraint';
+import AnalyticsIcon from "@mui/icons-material/Analytics";
+import { applyCorrection } from 'src/api/metadata.service';
+
 
 const TabPanel = (props) => {
-  const { children, value, index, ...other } = props;
+  const { children, value, index,bd_id, ...other } = props;
+
+  
 
   return (
     <div
@@ -32,18 +37,38 @@ const a11yProps = (index) => {
   };
 };
 
-const DataCorrectionTabs = ({ yourData }) => {
+const DataCorrectionTabs = ({ yourData, bd_id }) => {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
+  const handleCorrection = (bd_id) =>{
+    applyCorrection(bd_id).then((resultat)=>{
+      console.log("resultat", resultat);
+    })
+  }
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <Card>
-          <CardHeader title="Corrections des Anomalies" />
+
+          <Box>
+          <CardHeader sx={{ textAlign: 'left' }} title="Corrections des Anomalies" />
+
+          <Box mb={2} sx={{ textAlign: 'right' }}>
+              <Button 
+                startIcon={<SvgIcon fontSize="small"><AnalyticsIcon /></SvgIcon>}
+                variant="contained"
+                color="success"
+                onClick={() => handleCorrection(bd_id)}
+              >
+                Appliquer les corrections
+              </Button>
+          </Box>
+          </Box>
           <CardContent>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
