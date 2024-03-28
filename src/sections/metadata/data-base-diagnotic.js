@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination } from '@mui/material';
 
-const ClientsTable = ({ clients, diagnostics }) => {
+const ClientsTable = forwardRef((props, ref) => {
+
+  const { clients, diagnostics } = props
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -25,7 +28,7 @@ const ClientsTable = ({ clients, diagnostics }) => {
   const getCellStyle = (client, columnName) => {
     const invalidValues = [null, 'null', '-', '!', '?', '', ' ', '  ', 'inexistant', 'INEXISTANT', 'Inexistant', 'inconnu', 'INCONNU', 'Inconnu'];
     if (invalidValues.includes(client[columnName])) {
-      return { backgroundColor: '#eb4d4b', color: 'white' };
+      return { backgroundColor: 'rgb(251 164 163)', color: 'white'};
     }    
     return {}; // default style
   };
@@ -45,7 +48,7 @@ const ClientsTable = ({ clients, diagnostics }) => {
   };
   return (
     <>
-      <TableContainer component={Paper} style={{ maxWidth: '100%', overflowX: 'auto' }}>
+      <TableContainer component={Paper} style={{ maxWidth: '100%', overflowX: 'auto' }} id='clientsTable' ref={ref}>
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
@@ -79,6 +82,6 @@ const ClientsTable = ({ clients, diagnostics }) => {
       />
     </>
   );
-};
+});
 
 export default ClientsTable;

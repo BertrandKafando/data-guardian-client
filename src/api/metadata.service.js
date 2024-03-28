@@ -42,7 +42,7 @@ export const getAnalyseDatabase = async(bd_id) => {
     const response = await Api.get("user-data/?db_id=" + bd_id);
     return response.data;
   } catch (error) {
-    console.error("Error getting database score", error);
+    console.error("Error getting database", error);
     throw error;
   }
 }
@@ -60,10 +60,23 @@ export const getDiagnosticDetails = async (bd_id) => {
 export const applyCorrection = async (bd_id) => {
   try {
     const response = await Api.get("correction-anomalies/?bd_id=" + bd_id);
-    console.log("CORRECTION", response.data);
     return response.data;
   } catch (error) {
     console.error("Error correction", error);
+    throw error;
+  }
+}
+
+
+export const downloadData = async (bd_id) => {
+  try {
+    const response = await Api.get("download-data/?bd_id=" + bd_id, {
+      responseType: 'blob'
+  });
+    return response;
+
+  } catch (error) {
+    console.error("Error download", error);
     throw error;
   }
 }

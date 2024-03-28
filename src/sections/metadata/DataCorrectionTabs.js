@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Card, CardHeader, CardContent, Tabs, Tab, Box, Button, SvgIcon } from "@mui/material";
+import { Grid, Card, CardHeader, CardContent, Tabs, Tab, Box, Button, SvgIcon, CircularProgress } from "@mui/material";
 import AnomaliesComponent from 'src/sections/metadata/null-diagnotic';
 import OutliersComponent from 'src/sections/metadata/outliers-diagnotic';
 import DuplicatesComponent from 'src/sections/metadata/doublons-sim-diagnotic';
@@ -37,18 +37,15 @@ const a11yProps = (index) => {
   };
 };
 
-const DataCorrectionTabs = ({ yourData, bd_id }) => {
+const DataCorrectionTabs = ({ yourData, bd_id,correctionLoading, handleCorrection}) => {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const handleCorrection = (bd_id) =>{
-    applyCorrection(bd_id).then((resultat)=>{
-      console.log("resultat", resultat);
-    })
-  }
+
+
 
   return (
     <Grid container spacing={3}>
@@ -59,14 +56,32 @@ const DataCorrectionTabs = ({ yourData, bd_id }) => {
           <CardHeader sx={{ textAlign: 'left' }} title="Corrections des Anomalies" />
 
           <Box mb={2} sx={{ textAlign: 'right' }}>
+
+            {correctionLoading ? (
+
+                <Button 
+                variant="contained"
+                color="success"
+                onClick={() => handleCorrection(bd_id)}
+                >
+               
+                  <CircularProgress color="secondary"/>
+
+
+                </Button>
+
+            ): (
+
               <Button 
                 startIcon={<SvgIcon fontSize="small"><AnalyticsIcon /></SvgIcon>}
                 variant="contained"
                 color="success"
                 onClick={() => handleCorrection(bd_id)}
-              >
+                >
                 Appliquer les corrections
               </Button>
+            )}
+              
           </Box>
           </Box>
           <CardContent>

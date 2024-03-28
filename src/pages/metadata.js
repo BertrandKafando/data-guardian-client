@@ -1,6 +1,6 @@
-import React, { useState , useEffect } from 'react';
+import React, { useState , useEffect, useRef } from 'react';
 import Head from 'next/head';
-import { Box, Container, Grid, Select, MenuItem , Typography, Card, CardHeader, CardContent, CircularProgress} from '@mui/material';
+import { Box, Container, Grid, Select, MenuItem , Typography, Card, CardHeader, CardContent, CircularProgress, Button, SvgIcon} from '@mui/material';
 import Pagination from '@mui/material/Pagination';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { MetaTable } from 'src/sections/metadata/metadata-meta-table';
@@ -8,14 +8,16 @@ import { MetaColonne } from 'src/sections/metadata/metadata-meta-colonne';
 import DataCorrectionTabs from 'src/sections/metadata/DataCorrectionTabs';
 import ClientsTable from 'src/sections/metadata/data-base-diagnotic';
 
+
 import { select } from 'd3';
 import * as d3 from 'd3';
 import Chart from 'chart.js/auto';
-import { getDiagnosticScore, getMetaColonne, getMetaTable,getAnalyseDatabase,getDiagnosticDetails } from 'src/api/metadata.service';
+import { getDiagnosticScore, getMetaColonne, getMetaTable,getAnalyseDatabase,getDiagnosticDetails, applyCorrection, downloadData } from 'src/api/metadata.service';
 import { useRouter } from 'next/router';
 import PieGraph from 'src/sections/metadata/pie-graph';
 import { height, width } from '@mui/system';
 import { Score, ScoreDiagnostic } from 'src/components/score_diagnostic';
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 const Page = () => {
   const itemsPerPage = 5;
@@ -25,6 +27,7 @@ const Page = () => {
   const [metaColonneData, setMetaColonneData] = useState([]);
   const [nombreValeurs, setNombreValeurs] = useState(0);
   const [database,setDatabase] = useState([]);
+  const [correctionDatabase,setCorrectionDatabase] = useState([]);
   const [diagnotic_data, setDiagnoticData] = useState([]);
 
 
@@ -112,6 +115,8 @@ const Page = () => {
      
   };
 
+  const [tableName, setTableName] = useState(null)
+
   
   const getMetaTableData = async(bd_id) => {
     await getMetaTable(bd_id).then((data) => {
@@ -119,6 +124,7 @@ const Page = () => {
       if (meta_tables.length > 0){
         setMetaTableData(data?.results);
         setNombreValeurs(meta_tables[0].nombre_lignes);
+        setTableName(meta_tables[0].nom_table)
         meta_tables.forEach(async(meta_table) => {
           await getMetaColonneData(meta_table.id, meta_tables[0].nombre_lignes);
         });
@@ -344,6 +350,54 @@ const Page = () => {
 
   }, [])
 
+  const [correctionLoading, setCorrectionLoading] = useState(false);
+
+  const clientsTableRef = useRef(null);
+
+  const scrollToClientsTable = () => {
+    let path = "/metadata?bd_id=" + bd_id + "#clientsTable";
+    router.push(path);
+  };
+
+  useEffect(() => {
+    if (clientsTableRef.current && router.asPath.includes('#clientsTable')) {
+      clientsTableRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [router.asPath]);
+
+
+  const handleCorrection = (bd_id) =>{
+    setCorrectionLoading(true);
+    applyCorrection(bd_id).then((resultat)=>{
+
+      if (resultat != null){
+        setCorrectionDatabase(resultat);
+        scrollToClientsTable();
+      }
+      setCorrectionLoading(false);
+      
+    }).catch(error => {
+      setCorrectionLoading(false);
+    })
+  }
+
+  const handleDownloadData = (bd_id) => {
+    downloadData(bd_id).then((response)=>{
+      if (response != null){
+        const filename = tableName ? tableName.split('_')[0] + '_correction.csv' : 'data_correction.csv';
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+      }
+    }).catch(error =>{
+      console.log(error);
+    })
+  }
+
 
 
   const renderTitle = (title) => {
@@ -460,9 +514,28 @@ const Page = () => {
             </Grid>
             )}
 
-               <DataCorrectionTabs yourData={diagnotic_data}  bd_id={bd_id} />
+               <DataCorrectionTabs yourData={diagnotic_data}  bd_id={bd_id} correctionLoading={correctionLoading} handleCorrection={handleCorrection} />
 
               <ClientsTable clients={database} diagnostics={diagnotic_data} />
+
+              {correctionDatabase.length > 0 && (
+                <Box marginTop={5} style={{width: '100%'}}>
+                 <Typography variant='h6' style={{marginBottom: 10}}>Vos données après la correction</Typography>
+                 <Box mb={2} sx={{ textAlign: 'right' }}>
+                    <Button 
+                      startIcon={<SvgIcon fontSize="small"><DownloadForOfflineIcon /></SvgIcon>}
+                      variant="contained"
+                      color="success"
+                      onClick={()=> handleDownloadData(bd_id)}
+                    >
+                      Télécharger la base de données corrigée
+                    </Button>
+                 </Box>
+                 <ClientsTable ref={clientsTableRef} clients={correctionDatabase} diagnostics={[]} />
+                
+                </Box>
+
+              )}
       
         
             </Grid>
