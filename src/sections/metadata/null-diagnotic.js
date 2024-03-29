@@ -4,7 +4,7 @@ import AnalyticsIcon from "@mui/icons-material/Analytics";
 
 const AnomaliesComponent = ({ anomaliesData }) => {
   const [corrections, setCorrections] = useState({});
-
+  console.log(anomaliesData);
   const valeurNullAnomalies = anomaliesData.filter(anomalie => anomalie.anomalie === 'VALEUR_NULL');
   const groupAnomaliesByColumn = (data) => {
     const grouped = {};
