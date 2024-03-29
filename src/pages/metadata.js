@@ -1,18 +1,23 @@
-import React, { useState , useEffect } from 'react';
+import React, { useState , useEffect, useRef } from 'react';
 import Head from 'next/head';
-import { Box, Container, Grid, Select, MenuItem , Typography, Card, CardHeader, CardContent, CircularProgress} from '@mui/material';
+import { Box, Container, Grid, Select, MenuItem , Typography, Card, CardHeader, CardContent, CircularProgress, Button, SvgIcon} from '@mui/material';
 import Pagination from '@mui/material/Pagination';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { MetaTable } from 'src/sections/metadata/metadata-meta-table';
 import { MetaColonne } from 'src/sections/metadata/metadata-meta-colonne';
+import DataCorrectionTabs from 'src/sections/metadata/DataCorrectionTabs';
+import ClientsTable from 'src/sections/metadata/data-base-diagnotic';
+
+
 import { select } from 'd3';
 import * as d3 from 'd3';
 import Chart from 'chart.js/auto';
-import { getDiagnosticScore, getMetaColonne, getMetaTable } from 'src/api/metadata.service';
+import { getDiagnosticScore, getMetaColonne, getMetaTable,getAnalyseDatabase,getDiagnosticDetails, applyCorrection, downloadData } from 'src/api/metadata.service';
 import { useRouter } from 'next/router';
 import PieGraph from 'src/sections/metadata/pie-graph';
 import { height, width } from '@mui/system';
 import { Score, ScoreDiagnostic } from 'src/components/score_diagnostic';
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 const Page = () => {
   const itemsPerPage = 5;
@@ -21,537 +26,16 @@ const Page = () => {
   const [metaTableData, setMetaTableData] = useState([]);
   const [metaColonneData, setMetaColonneData] = useState([]);
   const [nombreValeurs, setNombreValeurs] = useState(0);
+  const [database,setDatabase] = useState([]);
+  const [correctionDatabase,setCorrectionDatabase] = useState([]);
+  const [diagnotic_data, setDiagnoticData] = useState([]);
+
+
+
 
 
   const router = useRouter();
-  const { bd_id } = router.query;
-
-  // const metaTableData = [
-  //   {
-  //     id: 1,
-  //     nom_table: 'CLIENTS',
-  //     nombre_colonne: 10,
-  //     nombre_ligne: 124,
-  //     date_creation: "2023-11-18",
-  //     date_diagnostic:"2023-11-21"
-  //   },
-  //   {
-  //     id: 2,
-  //     nom_table: 'MAGASIN',
-  //     nombre_colonne: 5,
-  //     nombre_ligne: 12,
-  //     date_creation: "2023-11-18",
-  //     date_diagnostic:"2023-11-21"
-  //   },
-  //   {
-  //     id: 3,
-  //     nom_table: 'ARTICLES',
-  //     nombre_colonne: 8,
-  //     nombre_ligne: 548,
-  //     date_creation: "2023-11-18",
-  //     date_diagnostic:"2023-11-21"
-  //   },
-  //   {
-  //     id: 3,
-  //     nom_table: 'ARTICLES',
-  //     nombre_colonne: 8,
-  //     nombre_ligne: 548,
-  //     date_creation: "2023-11-18",
-  //     date_diagnostic:"2023-11-21"
-  //   },
-  //   {
-  //     id: 3,
-  //     nom_table: 'ARTICLES',
-  //     nombre_colonne: 8,
-  //     nombre_ligne: 548,
-  //     date_creation: "2023-11-18",
-  //     date_diagnostic:"2023-11-21"
-  //   },
-  //   {
-  //     id: 3,
-  //     nom_table: 'ARTICLES',
-  //     nombre_colonne: 8,
-  //     nombre_ligne: 548,
-  //     date_creation: "2023-11-18",
-  //     date_diagnostic:"2023-11-21"
-  //   },
-  //   {
-  //     id: 3,
-  //     nom_table: 'ARTICLES',
-  //     nombre_colonne: 8,
-  //     nombre_ligne: 548,
-  //     date_creation: "2023-11-18",
-  //     date_diagnostic:"2023-11-21"
-  //   },
-  //   {
-  //     id: 3,
-  //     nom_table: 'ARTICLES',
-  //     nombre_colonne: 8,
-  //     nombre_ligne: 548,
-  //     date_creation: "2023-11-18",
-  //     date_diagnostic:"2023-11-21"
-  //   },
-  //   {
-  //     id: 3,
-  //     nom_table: 'ARTICLES',
-  //     nombre_colonne: 8,
-  //     nombre_ligne: 548,
-  //     date_creation: "2023-11-18",
-  //     date_diagnostic:"2023-11-21"
-  //   },
-  //   {
-  //     id: 3,
-  //     nom_table: 'ARTICLES',
-  //     nombre_colonne: 8,
-  //     nombre_ligne: 548,
-  //     date_creation: "2023-11-18",
-  //     date_diagnostic:"2023-11-21"
-  //   }
-  // ];
-
-  // const metaColonneData = [
-  //   {
-  //     id_meta_colonne : 1,
-  //     id_meta_table: 1,
-  //     id_meta_special_car: 1, 
-  //     id_table_origin: "CODCLI",
-  //     nom_colonne: "NOMCLI",
-  //     type_donnee: "Varchar",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: "CD001",
-  //     col_max: "FG0A01"
-  //   },
-  //   {
-  //     id_meta_colonne :2,
-  //     id_meta_table: 2,
-  //     id_meta_special_car: 2, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "LOCATION",
-  //     type_donnee: "Varchar",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 12,
-  //     nombre_valeur_manquante: 3,
-  //     nombre_outliers: 0,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 12,
-  //     nombre_majuscules: 12,
-  //     nombre_miniscules: 0,
-  //     nombre_initcap: 0,
-  //     col_min: "Dakar",
-  //     col_max: "Epinay sur seine"
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   },
-  //   {
-  //     id_meta_colonne : 3,
-  //     id_meta_table: 3,
-  //     id_meta_special_car: 3, 
-  //     id_table_origin: "REFART",
-  //     nom_colonne: "PRIX",
-  //     type_donnee: "NUMBER",
-  //     date_creation: "22/11/2023",
-  //     date_diagnostic: "22/11/2023",
-  //     nombre_valeur: 42,
-  //     nombre_valeur_manquante: 17,
-  //     nombre_outliers: 3,
-  //     semantique: null,
-  //     langue: "FR",
-  //     nombre_anomalie: 24,
-  //     nombre_majuscules: 24,
-  //     nombre_miniscules: 24,
-  //     nombre_initcap: 24,
-  //     col_min: 12.5,
-  //     col_max: 158.99
-  //   }
-  // ];
+  const { bd_id } = router.query; 
 
   const handleChangeTablePage = (event, newPage) => {
     setCurrentTablePage(newPage);
@@ -631,6 +115,8 @@ const Page = () => {
      
   };
 
+  const [tableName, setTableName] = useState(null)
+
   
   const getMetaTableData = async(bd_id) => {
     await getMetaTable(bd_id).then((data) => {
@@ -638,6 +124,7 @@ const Page = () => {
       if (meta_tables.length > 0){
         setMetaTableData(data?.results);
         setNombreValeurs(meta_tables[0].nombre_lignes);
+        setTableName(meta_tables[0].nom_table)
         meta_tables.forEach(async(meta_table) => {
           await getMetaColonneData(meta_table.id, meta_tables[0].nombre_lignes);
         });
@@ -681,11 +168,30 @@ const Page = () => {
       console.log(error);
     })
   }
+  
+  const getAnalyseData = async (db_id) => {
+    await getAnalyseDatabase(db_id)
+    .then((data)=>{
+      setDatabase(data)
+    }).catch((error)=>{
+      console.log(error);
+    })
+
+  }
+
+  const getDiagnosticData = async (bd_id) => {
+    await getDiagnosticDetails(bd_id).then((data)=>{
+      setDiagnoticData(data);
+    }).catch((error)=>{
+      console.log(error);
+    })
+  }
 
   useEffect(() => {
 
     getMetaTableData(bd_id);
-
+    getAnalyseData(bd_id);
+    getDiagnosticData(bd_id);
 
 
     if (selectedTableId !== null && selectedColumnName !== null) {
@@ -844,6 +350,54 @@ const Page = () => {
 
   }, [])
 
+  const [correctionLoading, setCorrectionLoading] = useState(false);
+
+  const clientsTableRef = useRef(null);
+
+  const scrollToClientsTable = () => {
+    let path = "/metadata?bd_id=" + bd_id + "#clientsTable";
+    router.push(path);
+  };
+
+  useEffect(() => {
+    if (clientsTableRef.current && router.asPath.includes('#clientsTable')) {
+      clientsTableRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [router.asPath]);
+
+
+  const handleCorrection = (bd_id) =>{
+    setCorrectionLoading(true);
+    applyCorrection(bd_id).then((resultat)=>{
+
+      if (resultat != null){
+        setCorrectionDatabase(resultat);
+        scrollToClientsTable();
+      }
+      setCorrectionLoading(false);
+      
+    }).catch(error => {
+      setCorrectionLoading(false);
+    })
+  }
+
+  const handleDownloadData = (bd_id) => {
+    downloadData(bd_id).then((response)=>{
+      if (response != null){
+        const filename = tableName ? tableName.split('_')[0] + '_correction.csv' : 'data_correction.csv';
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+      }
+    }).catch(error =>{
+      console.log(error);
+    })
+  }
+
 
 
   const renderTitle = (title) => {
@@ -865,6 +419,7 @@ const Page = () => {
                   'Nom table',
                   'Nombre colonnes',
                   'Nombre lignes',
+                  'Nombre de doublons',
                   'Date création',
                   // 'Date diagnostic',
                 ]}
@@ -883,7 +438,7 @@ const Page = () => {
           </Grid>
             <Grid xs={12} md={12} lg={12}>
               <MetaColonne
-                columnsNames={['ID', 'ID Méta table', 'Nom colonne', 'Type donnée', 'Date création', 'Date diagnostic', 'Nombre valeurs', 'Nombre de valeurs manquantes', 'Nombre outliers', 'Nombre anomalies', 'Nombre majuscules', 'Nombre Miniscules', 'Nombre initcap', 'Valeur minimale', 'Valeur maximale' ]}
+                columnsNames={['ID', 'ID Méta table', 'Nom colonne', 'Type donnée','Nombre de valeurs manquantes', 'Nombre outliers', 'Nombre anomalies', 'Nombre majuscules', 'Nombre Miniscules', 'Nombre initcap', 'Valeur minimale', 'Valeur maximale' ]}
                 data={metaColonneData.slice(colonneStartIndex, colonneEndIndex)}
                 nombre_lignes ={nombreValeurs}
                 count_anomalies={count_anomalies}
@@ -904,13 +459,13 @@ const Page = () => {
                 <Grid container spacing={3}>
               
               {missingValuesPieGraphData.length > 0 && (
-                <Grid item xs={12} md={3} lg={3}>
+                <Grid item xs={12} md={4} lg={4}>
                   <PieGraph data={missingValuesPieGraphData} title="Valeurs manquantes VS Existantes" colors={['green', 'red']} width={300} height={300} />
                 </Grid>
               )}
 
               {anomaliesPieGraphData.length > 0 && (
-                <Grid item xs={12} md={3} lg={3}>
+                <Grid item xs={12} md={4} lg={4}>
                   <PieGraph data={anomaliesPieGraphData} title=" Valeurs conformes VS anomalies" width={300} height={300} />
                 </Grid>
               )}
@@ -918,7 +473,7 @@ const Page = () => {
               
 
               {invalidPieGraphData.length > 0 && (
-                <Grid item xs={12} md={3} lg={3}>
+                <Grid item xs={12} md={4} lg={4}>
                   <PieGraph data={invalidPieGraphData} title="Valeurs invalides VS valides " colors={['orange', 'gray']} width={300} height={300} />
                 </Grid>
               )}
@@ -959,13 +514,31 @@ const Page = () => {
             </Grid>
             )}
 
+               <DataCorrectionTabs yourData={diagnotic_data}  bd_id={bd_id} correctionLoading={correctionLoading} handleCorrection={handleCorrection} />
 
+              <ClientsTable clients={database} diagnostics={diagnotic_data} />
 
+              {correctionDatabase.length > 0 && (
+                <Box marginTop={5} style={{width: '100%'}}>
+                 <Typography variant='h6' style={{marginBottom: 10}}>Vos données après la correction</Typography>
+                 <Box mb={2} sx={{ textAlign: 'right' }}>
+                    <Button 
+                      startIcon={<SvgIcon fontSize="small"><DownloadForOfflineIcon /></SvgIcon>}
+                      variant="contained"
+                      color="success"
+                      onClick={()=> handleDownloadData(bd_id)}
+                    >
+                      Télécharger la base de données corrigée
+                    </Button>
+                 </Box>
+                 <ClientsTable ref={clientsTableRef} clients={correctionDatabase} diagnostics={[]} />
+                
+                </Box>
 
+              )}
+      
         
-    
-          </Grid>
-         
+            </Grid>
         </Container>
       </Box>
     </>

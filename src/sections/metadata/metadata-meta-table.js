@@ -82,6 +82,9 @@ export const MetaTable = (props) => {
                         {row.nombre_lignes}
                     </TableCell>
                     <TableCell>
+                        {row.nombre_doublons}
+                    </TableCell>
+                    <TableCell>
                         {formatDateString(row.date_creation)}
                     </TableCell>
                     {/* <TableCell>
